@@ -7,7 +7,7 @@ from src.infrastructure.database.models import TrainerModel
 class SqlAlchemyTrainerRepository(TrainerRepository):
     
     def __init__(self, db: Session):
-        self.db = db                
+        self.db = db
     
     def create(self, trainer: Trainer) -> Trainer:
         db_trainer = TrainerModel(
@@ -15,12 +15,11 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
             gender=trainer.gender.value,
             region=trainer.region.value
         )
+        self.db.add(db_trainer)
+        self.db.commit()
+        self.db.refresh(db_trainer)
         
-        self.db.add(db_trainer)       
-        self.db.commit()              
-        self.db.refresh(db_trainer)   
-        
-        return self._model_to_entity(db_trainer)  # Mapear de vuelta
+        return self._model_to_entity(db_trainer)
     
     def get_by_id(self, trainer_id: int) -> Optional[Trainer]:
         db_trainer = self.db.query(TrainerModel).filter(
@@ -28,6 +27,39 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
         ).first()
         
         return self._model_to_entity(db_trainer) if db_trainer else None
+    
+    def get_all(self, skip: int = 0, limit: int = 100) -> List[Trainer]:
+        db_trainers = self.db.query(TrainerModel).offset(skip).limit(limit).all()
+        return [self._model_to_entity(trainer) for trainer in db_trainers]
+    
+    def update(self, trainer_id: int, trainer: Trainer) -> Optional[Trainer]:
+        db_trainer = self.db.query(TrainerModel).filter(
+            TrainerModel.id == trainer_id
+        ).first()
+        
+        if not db_trainer:
+            return None
+        
+        db_trainer.name = trainer.name
+        db_trainer.gender = trainer.gender.value
+        db_trainer.region = trainer.region.value
+        
+        self.db.commit()
+        self.db.refresh(db_trainer)
+        
+        return self._model_to_entity(db_trainer)
+    
+    def delete(self, trainer_id: int) -> bool:
+        db_trainer = self.db.query(TrainerModel).filter(
+            TrainerModel.id == trainer_id
+        ).first()
+        
+        if not db_trainer:
+            return False
+        
+        self.db.delete(db_trainer)
+        self.db.commit()
+        return True
     
     def _model_to_entity(self, model: TrainerModel) -> Trainer:
         return Trainer(

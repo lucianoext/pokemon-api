@@ -11,9 +11,18 @@ class TrainerCreateDTO(BaseModel):
         use_enum_values = True
 
 class TrainerUpdateDTO(BaseModel):
-    name: Optional[str] = None 
+    name: Optional[str] = None
     gender: Optional[Gender] = None
     region: Optional[Region] = None
+    
+    class Config:
+        use_enum_values = True
+
+class PokemonSummaryDTO(BaseModel):
+    id: int
+    name: str
+    type_primary: str
+    level: int
 
 class TrainerResponseDTO(BaseModel):
     id: int
@@ -21,6 +30,7 @@ class TrainerResponseDTO(BaseModel):
     gender: str
     region: str
     team_size: int
+    pokemon_team: List[PokemonSummaryDTO] = []
     
     class Config:
         from_attributes = True
