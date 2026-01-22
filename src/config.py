@@ -7,7 +7,6 @@ class Settings(BaseSettings):
         case_sensitive=False
     )
     
-    # All attributes must be INSIDE the class ✅
     API_VERSION: str = "1.0.0"
     ENV: str = "dev"  # dev | test | prod
     

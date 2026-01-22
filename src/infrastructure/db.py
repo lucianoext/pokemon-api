@@ -7,13 +7,11 @@ from app.config import settings
 
 def _create_engine(url: str) -> Engine:
     if url.startswith("sqlite"):
-        # SQLite en FastAPI (multi-hilo) requiere esto
         return create_engine(
             url,
             echo=settings.DB_ECHO,
             connect_args={"check_same_thread": False}
         )
-    # Postgres u otros
     return create_engine(
         url,
         echo=settings.DB_ECHO,
@@ -26,13 +24,11 @@ def _create_engine(url: str) -> Engine:
 engine: Engine = _create_engine(settings.DATABASE_URL)
 
 def get_session() -> Generator[Session, None, None]:
-    # Úsalo como dependencia en endpoints (yield)
     with Session(engine) as session:
         yield session
 
 def init_db() -> None:
-    # Importa los modelos para registrar tablas en el metadata
-    from app.persistence import models  # noqa: F401
+    from app.persistence import models
     SQLModel.metadata.create_all(engine)
 
 def ping_db() -> bool:
