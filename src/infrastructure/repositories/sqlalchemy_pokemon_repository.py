@@ -2,7 +2,7 @@ from typing import List, Optional
 import json
 from sqlalchemy.orm import Session
 from src.domain.repositories.pokemon_repository import PokemonRepository
-from src.domain.entities.pokemon import Pokemon, PokemonType, Nature
+from src.domain.entities.pokemon import Pokemon, PokemonType, PokemonNature
 from src.infrastructure.database.models import PokemonModel
 
 class SqlAlchemyPokemonRepository(PokemonRepository):
@@ -83,7 +83,7 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
         if model.type_secondary:
             secondary_type = PokemonType(model.type_secondary)
         
-        nature = Nature(model.nature)
+        nature = PokemonNature(model.nature)
         
         return Pokemon(
             id=model.id,
@@ -92,7 +92,7 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
             type_secondary=secondary_type,
             attacks=attacks_list,
             nature=nature,
-            level=model.level
+            level=model.level,
         )
     
     def _entity_to_model(self, pokemon: Pokemon) -> PokemonModel:

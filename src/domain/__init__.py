@@ -1,4 +1,4 @@
-from .entities import Trainer, Pokemon, Team, Backpack, Item
+from .entities import Trainer, Pokemon
 from .exceptions import (
     BusinessRuleException,
     ValidationException,
