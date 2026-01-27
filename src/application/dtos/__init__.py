@@ -4,3 +4,22 @@ from .pokemon_dto import (
     PokemonUpdateDTO, 
     PokemonResponseDTO,
 )
+from .team_dto import (
+    TeamAddPokemonDTO,
+    TeamUpdatePositionDTO,
+    TeamMemberResponseDTO,
+    TeamResponseDTO
+)
+
+__all__ = [
+    "TrainerCreateDTO", 
+    "TrainerResponseDTO", 
+    "TrainerUpdateDTO",
+    "PokemonCreateDTO",
+    "PokemonUpdateDTO",
+    "PokemonResponseDTO", 
+    "TeamAddPokemonDTO",
+    "TeamUpdatePositionDTO",
+    "TeamMemberResponseDTO", 
+    "TeamResponseDTO"
+]

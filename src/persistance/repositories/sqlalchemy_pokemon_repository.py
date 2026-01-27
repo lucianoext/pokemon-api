@@ -3,7 +3,7 @@ import json
 from sqlalchemy.orm import Session
 from src.domain.repositories.pokemon_repository import PokemonRepository
 from src.domain.entities.pokemon import Pokemon, PokemonType, PokemonNature
-from src.infrastructure.database.models import PokemonModel
+from src.persistance.database.models import PokemonModel
 
 class SqlAlchemyPokemonRepository(PokemonRepository):
     

@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from http import HTTPStatus
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database import get_database
-from src.infrastructure.repositories.sqlalchemy_trainer_repository import SqlAlchemyTrainerRepository
+from src.persistance.database import get_database
+from src.persistance.repositories.sqlalchemy_trainer_repository import SqlAlchemyTrainerRepository
 from src.application.services.trainer_service import TrainerService
 from src.application.dtos.trainer_dto import (
     TrainerCreateDTO, 
