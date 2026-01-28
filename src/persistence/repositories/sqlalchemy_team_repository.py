@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.domain.repositories.team_repository import TeamRepository
 from src.domain.entities.team import Team
-from src.persistance.database.models import TeamModel
+from src.persistence.database.models import TeamModel
 
 class SqlAlchemyTeamRepository(TeamRepository):
     

@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from http import HTTPStatus
 from sqlalchemy.orm import Session
 
-from src.persistance.database import get_database
-from src.persistance.repositories.sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
+from src.persistence.database import get_database
+from src.persistence.repositories.sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
 from src.application.services.pokemon_service import PokemonService
 from src.application.dtos.pokemon_dto import (
     PokemonCreateDTO,

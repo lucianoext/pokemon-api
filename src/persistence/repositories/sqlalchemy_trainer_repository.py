@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.domain.repositories.trainer_repository import TrainerRepository
 from src.domain.entities.trainer import Trainer, Gender, Region
-from src.persistance.database.models import TrainerModel
+from src.persistence.database.models import TrainerModel
 
 class SqlAlchemyTrainerRepository(TrainerRepository):
     

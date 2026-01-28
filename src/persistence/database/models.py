@@ -45,6 +45,7 @@ class ItemModel(Base):
     name = Column(String(50), nullable=False)
     type = Column(String(20), nullable=False)
     description = Column(Text, nullable=True)
+    price = Column(Integer, default=0)
     
     backpack_entries = relationship("BackpackModel", back_populates="item")
 

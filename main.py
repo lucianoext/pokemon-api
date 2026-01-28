@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.persistance.database.connection import engine, Base
+from src.persistence.database.connection import engine, Base
 from src.presentation.api.trainers import router as trainers_router
 from src.presentation.api.pokemon import router as pokemon_router
+from src.presentation.api.items import router as items_router
 from src.presentation.api.teams import router as teams_router
 
 Base.metadata.create_all(bind=engine)
@@ -33,6 +34,7 @@ def version():
 app.include_router(trainers_router, prefix="/api/v1")
 app.include_router(pokemon_router, prefix="/api/v1")
 app.include_router(teams_router, prefix="/api/v1") 
+app.include_router(items_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn
