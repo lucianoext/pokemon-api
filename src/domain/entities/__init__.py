@@ -2,5 +2,6 @@ from .trainer import Trainer
 from .pokemon import Pokemon
 from .team import Team
 from .item import Item
+from .backpack import Backpack
 
-__all__ = ["Trainer", "Pokemon", "Team", "Item"]
+__all__ = ["Trainer", "Pokemon", "Team", "Item", "Backpack"]
