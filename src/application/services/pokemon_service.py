@@ -20,7 +20,7 @@ class PokemonService:
             return None
         return self._transform_to_response_dto(pokemon)
     
-    def get_all_pokemon(self, skip: int = 0, limit: int = 100) -> List[PokemonResponseDTO]:  # ← Nombre corregido
+    def get_all_pokemon(self, skip: int = 0, limit: int = 100) -> List[PokemonResponseDTO]:
         pokemons = self.pokemon_repository.get_all(skip, limit)
         return [self._transform_to_response_dto(pokemon) for pokemon in pokemons]
     
@@ -88,7 +88,6 @@ class PokemonService:
         return self._transform_to_response_dto(updated_pokemon)
         
     def _validate_business_rules_for_creation(self, dto: PokemonCreateDTO) -> None:
-        # AGREGAR: Validación de nivel
         if dto.level < 1 or dto.level > 100:
             raise BusinessRuleException(f"Pokemon level must be between 1 and 100, got: {dto.level}")
         
@@ -100,7 +99,6 @@ class PokemonService:
         self._validate_powerful_attacks(attacks_list, dto.level)
 
     def _validate_business_rules_for_update(self, pokemon: Pokemon) -> None:
-        # AGREGAR: Validación de nivel
         if pokemon.level < 1 or pokemon.level > 100:
             raise BusinessRuleException(f"Pokemon level must be between 1 and 100, got: {pokemon.level}")
         
