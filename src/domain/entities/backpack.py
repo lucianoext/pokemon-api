@@ -1,9 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
 
 @dataclass
 class Backpack:
-    id: Optional[int]
+    id:  int | None
     trainer_id: int
     item_id: int
     quantity: int

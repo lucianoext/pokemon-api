@@ -1,6 +1,0 @@
-fastapi==0.104.1          # Como Microsoft.AspNetCore
-uvicorn[standard]==0.24.0 # Como Kestrel server
-sqlalchemy==2.0.23        # Como Entity Framework Core
-pydantic==2.5.0          # Como System.ComponentModel.DataAnnotations
-pytest==7.4.3           # Como xUnit/NUnit
-httpx==0.25.2            # Como HttpClient para tests

@@ -1,4 +1,3 @@
-from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from http import HTTPStatus
 from sqlalchemy.orm import Session
@@ -38,7 +37,7 @@ def get_pokemon(
         )
     return pokemon
 
-@router.get("/", response_model=List[PokemonResponseDTO])
+@router.get("/", response_model=list[PokemonResponseDTO])
 def get_pokemon_list(
     skip: int = 0,
     limit: int = 100,
@@ -90,7 +89,7 @@ def level_up_pokemon(
 def learn_attack(
     pokemon_id: int,
     new_attack: str,
-    replace_attack: Optional[str] = None,
+    replace_attack: str | None = None,
     service: PokemonService = Depends(get_pokemon_service)
 ):
     try:

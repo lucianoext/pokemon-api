@@ -1,19 +1,9 @@
-from typing import Optional
 from dataclasses import dataclass
-from enum import Enum
-
-class ItemType(Enum):
-    POKEBALL = "pokeball"
-    ANTIDOTE = "antidote"
-    BERRY = "berry"
-    POTION = "potion"
-    REVIVE = "revive"
-    STONE = "stone"
-    TM = "tm"
+from src.domain.enums.item_enums import ItemType
 
 @dataclass
 class Item:
-    id: Optional[int]
+    id:  int | None
     name: str
     type: ItemType
     description: str

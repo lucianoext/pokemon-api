@@ -1,4 +1,3 @@
-from typing import List, Optional
 import json
 from sqlalchemy.orm import Session
 from src.domain.repositories.pokemon_repository import PokemonRepository
@@ -26,18 +25,18 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
         
         return self._model_to_entity(db_pokemon)
     
-    def get_by_id(self, pokemon_id: int) -> Optional[Pokemon]:
+    def get_by_id(self, pokemon_id: int) -> Pokemon | None:
         db_pokemon = self.db.query(PokemonModel).filter(
             PokemonModel.id == pokemon_id
         ).first()
         
         return self._model_to_entity(db_pokemon) if db_pokemon else None
     
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Pokemon]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Pokemon]:
         db_pokemons = self.db.query(PokemonModel).offset(skip).limit(limit).all()
         return [self._model_to_entity(pokemon) for pokemon in db_pokemons]
     
-    def update(self, pokemon_id: int, pokemon: Pokemon) -> Optional[Pokemon]:
+    def update(self, pokemon_id: int, pokemon: Pokemon) -> Pokemon | None:
         db_pokemon = self.db.query(PokemonModel).filter(
             PokemonModel.id == pokemon_id
         ).first()

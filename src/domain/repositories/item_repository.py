@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from ..entities.item import Item
 
 class ItemRepository(ABC):
@@ -9,15 +8,15 @@ class ItemRepository(ABC):
         pass
     
     @abstractmethod
-    def get_by_id(self, item_id: int) -> Optional[Item]:
+    def get_by_id(self, item_id: int) -> Item | None:
         pass
     
     @abstractmethod
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Item]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Item]:
         pass
     
     @abstractmethod
-    def update(self, item_id: int, item: Item) -> Optional[Item]:
+    def update(self, item_id: int, item: Item) -> Item | None:
         pass
     
     @abstractmethod
@@ -25,5 +24,5 @@ class ItemRepository(ABC):
         pass
     
     @abstractmethod
-    def get_by_type(self, item_type: str) -> List[Item]:
+    def get_by_type(self, item_type: str) -> list[Item]:
         pass

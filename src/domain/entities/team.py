@@ -1,9 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
 
 @dataclass
 class Team:
-    id: Optional[int]
+    id:  int | None
     trainer_id: int
     pokemon_id: int
     position: int

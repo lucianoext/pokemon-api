@@ -1,4 +1,3 @@
-from typing import List, Optional
 from src.domain.repositories.backpack_repository import BackpackRepository
 from src.domain.repositories.trainer_repository import TrainerRepository
 from src.domain.repositories.item_repository import ItemRepository

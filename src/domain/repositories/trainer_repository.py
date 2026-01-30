@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from ..entities.trainer import Trainer
 
 class TrainerRepository(ABC):
@@ -9,15 +8,15 @@ class TrainerRepository(ABC):
         pass
     
     @abstractmethod
-    def get_by_id(self, trainer_id: int) -> Optional[Trainer]:
+    def get_by_id(self, trainer_id: int) -> Trainer | None:
         pass
     
     @abstractmethod
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Trainer]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Trainer]:
         pass
     
     @abstractmethod
-    def update(self, trainer_id: int, trainer: Trainer) -> Optional[Trainer]:
+    def update(self, trainer_id: int, trainer: Trainer) -> Trainer | None:
         pass
     
     @abstractmethod

@@ -1,4 +1,3 @@
-from typing import List, Optional
 from src.domain.repositories.item_repository import ItemRepository
 from src.domain.entities.item import Item
 from src.application.dtos.item_dto import (
@@ -19,17 +18,17 @@ class ItemService:
         created_item = self.item_repository.create(item)
         return self._transform_to_response_dto(created_item)
     
-    def get_item(self, item_id: int) -> Optional[ItemResponseDTO]:
+    def get_item(self, item_id: int) -> ItemResponseDTO | None:
         item = self.item_repository.get_by_id(item_id)
         if not item:
             return None
         return self._transform_to_response_dto(item)
     
-    def get_all_items(self, skip: int = 0, limit: int = 100) -> List[ItemResponseDTO]:
+    def get_all_items(self, skip: int = 0, limit: int = 100) -> list[ItemResponseDTO]:
         items = self.item_repository.get_all(skip, limit)
         return [self._transform_to_response_dto(item) for item in items]
     
-    def update_item(self, item_id: int, dto: ItemUpdateDTO) -> Optional[ItemResponseDTO]:
+    def update_item(self, item_id: int, dto: ItemUpdateDTO) -> ItemResponseDTO | None:
         existing_item = self.item_repository.get_by_id(item_id)
         if not existing_item:
             return None
@@ -50,7 +49,7 @@ class ItemService:
     def delete_item(self, item_id: int) -> bool:
         return self.item_repository.delete(item_id)
     
-    def get_items_by_type(self, item_type: str) -> List[ItemResponseDTO]:
+    def get_items_by_type(self, item_type: str) -> list[ItemResponseDTO]:
         items = self.item_repository.get_by_type(item_type)
         return [self._transform_to_response_dto(item) for item in items]
     

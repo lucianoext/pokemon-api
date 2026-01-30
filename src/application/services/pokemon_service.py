@@ -1,4 +1,3 @@
-from typing import List, Optional
 from src.application.dtos.pokemon_dto import PokemonCreateDTO, PokemonResponseDTO, PokemonUpdateDTO
 from src.domain.entities.pokemon import Pokemon
 from src.domain.repositories.pokemon_repository import PokemonRepository
@@ -14,17 +13,17 @@ class PokemonService:
         created_pokemon = self.pokemon_repository.create(pokemon)
         return self._transform_to_response_dto(created_pokemon)
     
-    def get_pokemon(self, pokemon_id: int) -> Optional[PokemonResponseDTO]:
+    def get_pokemon(self, pokemon_id: int) -> PokemonResponseDTO | None:
         pokemon = self.pokemon_repository.get_by_id(pokemon_id)
         if not pokemon:
             return None
         return self._transform_to_response_dto(pokemon)
     
-    def get_all_pokemon(self, skip: int = 0, limit: int = 100) -> List[PokemonResponseDTO]:
+    def get_all_pokemon(self, skip: int = 0, limit: int = 100) -> list[PokemonResponseDTO]:
         pokemons = self.pokemon_repository.get_all(skip, limit)
         return [self._transform_to_response_dto(pokemon) for pokemon in pokemons]
     
-    def update_pokemon(self, pokemon_id: int, pokemon_dto: PokemonUpdateDTO) -> Optional[PokemonResponseDTO]:
+    def update_pokemon(self, pokemon_id: int, pokemon_dto: PokemonUpdateDTO) -> PokemonResponseDTO | None:
         existing_pokemon = self.pokemon_repository.get_by_id(pokemon_id)
         if not existing_pokemon:
             return None
@@ -44,7 +43,7 @@ class PokemonService:
         saved_pokemon = self.pokemon_repository.update(pokemon_id, updated_pokemon)
         return self._transform_to_response_dto(saved_pokemon)
 
-    def level_up_pokemon(self, pokemon_id: int, levels: int = 1) -> Optional[PokemonResponseDTO]:
+    def level_up_pokemon(self, pokemon_id: int, levels: int = 1) -> PokemonResponseDTO | None:
         pokemon = self.pokemon_repository.get_by_id(pokemon_id)
         if not pokemon:
             return None
@@ -60,8 +59,8 @@ class PokemonService:
         self, 
         pokemon_id: int, 
         new_attack: str,
-        replace_attack: Optional[str] = None
-    ) -> Optional[PokemonResponseDTO]:
+        replace_attack: str | None = None
+    ) -> PokemonResponseDTO | None:
         
         pokemon = self.pokemon_repository.get_by_id(pokemon_id)
         if not pokemon:
@@ -109,7 +108,7 @@ class PokemonService:
         
         self._validate_powerful_attacks(attacks_list, pokemon.level)
     
-    def _validate_powerful_attacks(self, attacks_list: List[str], level: int) -> None:
+    def _validate_powerful_attacks(self, attacks_list: list[str], level: int) -> None:
         powerful_attacks = {
             'Hyper Beam': 50,
             'Solar Beam': 40,

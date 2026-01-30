@@ -1,4 +1,3 @@
-from typing import List, Optional
 from pydantic import BaseModel
 
 class BackpackAddItemDTO(BaseModel):
@@ -26,4 +25,4 @@ class BackpackResponseDTO(BaseModel):
     trainer_id: int
     trainer_name: str
     total_items: int
-    items: List[BackpackItemResponseDTO]
+    items: list[BackpackItemResponseDTO]

@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from http import HTTPStatus
 from sqlalchemy.orm import Session
@@ -38,7 +37,7 @@ def get_item(
         )
     return item
 
-@router.get("/", response_model=List[ItemResponseDTO])
+@router.get("/", response_model=list[ItemResponseDTO])
 def get_items(
     skip: int = 0,
     limit: int = 100,
@@ -72,7 +71,7 @@ def delete_item(
             detail=f"Item with id {item_id} not found"
         )
 
-@router.get("/type/{item_type}", response_model=List[ItemResponseDTO])
+@router.get("/type/{item_type}", response_model=list[ItemResponseDTO])
 def get_items_by_type(
     item_type: str,
     service: ItemService = Depends(get_item_service)

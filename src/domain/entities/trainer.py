@@ -1,25 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
-from enum import Enum
-
-class Gender(Enum):
-    MALE = "male"
-    FEMALE = "female"
-    OTHER = "other"
-
-class Region(Enum):
-    KANTO = "kanto"
-    JOHTO = "johto"
-    HOENN = "hoenn"
-    SINNOH = "sinnoh"
-    UNOVA = "unova"
-    KALOS = "kalos"
-    ALOLA = "alola"
-    GALAR = "galar"
-
+from src.domain.enums.trainer_enums import Gender, Region
 @dataclass
 class Trainer:
-    id: Optional[int]
+    id:  int | None
     name: str
     gender: Gender
     region: Region

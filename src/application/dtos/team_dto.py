@@ -1,4 +1,3 @@
-from typing import List, Optional
 from pydantic import BaseModel
 
 class TeamAddPokemonDTO(BaseModel):
@@ -24,4 +23,4 @@ class TeamResponseDTO(BaseModel):
     trainer_name: str
     team_size: int
     max_size: int = 6
-    members: List[TeamMemberResponseDTO]
+    members: list[TeamMemberResponseDTO]

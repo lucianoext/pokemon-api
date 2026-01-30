@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional, List
 from src.domain.entities.trainer import Gender, Region
 
 class TrainerCreateDTO(BaseModel):
@@ -11,9 +10,9 @@ class TrainerCreateDTO(BaseModel):
         use_enum_values = True
 
 class TrainerUpdateDTO(BaseModel):
-    name: Optional[str] = None
-    gender: Optional[Gender] = None
-    region: Optional[Region] = None
+    name: str | None = None
+    gender: Gender | None = None
+    region: Region | None = None
     
     class Config:
         use_enum_values = True
@@ -30,7 +29,7 @@ class TrainerResponseDTO(BaseModel):
     gender: str
     region: str
     team_size: int
-    pokemon_team: List[PokemonSummaryDTO] = []
+    pokemon_team: list[PokemonSummaryDTO] = []
     
     class Config:
         from_attributes = True

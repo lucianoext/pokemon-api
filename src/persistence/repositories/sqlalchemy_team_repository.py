@@ -1,4 +1,3 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.domain.repositories.team_repository import TeamRepository
@@ -40,7 +39,7 @@ class SqlAlchemyTeamRepository(TeamRepository):
         self.db.commit()
         return True
     
-    def get_team_by_trainer(self, trainer_id: int) -> List[Team]:
+    def get_team_by_trainer(self, trainer_id: int) -> list[Team]:
         db_teams = self.db.query(TeamModel).filter(
             and_(
                 TeamModel.trainer_id == trainer_id,
@@ -50,7 +49,7 @@ class SqlAlchemyTeamRepository(TeamRepository):
         
         return [self._model_to_entity(team) for team in db_teams]
     
-    def get_team_member(self, trainer_id: int, pokemon_id: int) -> Optional[Team]:
+    def get_team_member(self, trainer_id: int, pokemon_id: int) -> Team | None:
         db_team = self.db.query(TeamModel).filter(
             and_(
                 TeamModel.trainer_id == trainer_id,
@@ -61,7 +60,7 @@ class SqlAlchemyTeamRepository(TeamRepository):
         
         return self._model_to_entity(db_team) if db_team else None
     
-    def update_position(self, trainer_id: int, pokemon_id: int, new_position: int) -> Optional[Team]:
+    def update_position(self, trainer_id: int, pokemon_id: int, new_position: int) -> Team | None:
         db_team = self.db.query(TeamModel).filter(
             and_(
                 TeamModel.trainer_id == trainer_id,

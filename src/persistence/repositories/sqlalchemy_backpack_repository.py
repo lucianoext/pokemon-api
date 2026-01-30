@@ -1,4 +1,3 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from src.domain.repositories.backpack_repository import BackpackRepository
@@ -55,7 +54,7 @@ class SqlAlchemyBackpackRepository(BackpackRepository):
         self.db.commit()
         return True
     
-    def get_trainer_backpack(self, trainer_id: int) -> List[Backpack]:
+    def get_trainer_backpack(self, trainer_id: int) -> list[Backpack]:
         db_backpacks = self.db.query(BackpackModel).filter(
             BackpackModel.trainer_id == trainer_id
         ).all()
@@ -72,7 +71,7 @@ class SqlAlchemyBackpackRepository(BackpackRepository):
         
         return db_backpack.quantity if db_backpack else 0
     
-    def update_quantity(self, trainer_id: int, item_id: int, new_quantity: int) -> Optional[Backpack]:
+    def update_quantity(self, trainer_id: int, item_id: int, new_quantity: int) -> Backpack | None:
         db_backpack = self.db.query(BackpackModel).filter(
             and_(
                 BackpackModel.trainer_id == trainer_id,

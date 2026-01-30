@@ -1,4 +1,3 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.domain.repositories.item_repository import ItemRepository
 from src.domain.entities.item import Item, ItemType
@@ -23,18 +22,18 @@ class SqlAlchemyItemRepository(ItemRepository):
         
         return self._model_to_entity(db_item)
     
-    def get_by_id(self, item_id: int) -> Optional[Item]:
+    def get_by_id(self, item_id: int) -> Item | None:
         db_item = self.db.query(ItemModel).filter(
             ItemModel.id == item_id
         ).first()
         
         return self._model_to_entity(db_item) if db_item else None
     
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Item]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Item]:
         db_items = self.db.query(ItemModel).offset(skip).limit(limit).all()
         return [self._model_to_entity(item) for item in db_items]
     
-    def update(self, item_id: int, item: Item) -> Optional[Item]:
+    def update(self, item_id: int, item: Item) -> Item | None:
         db_item = self.db.query(ItemModel).filter(
             ItemModel.id == item_id
         ).first()
@@ -64,7 +63,7 @@ class SqlAlchemyItemRepository(ItemRepository):
         self.db.commit()
         return True
     
-    def get_by_type(self, item_type: str) -> List[Item]:
+    def get_by_type(self, item_type: str) -> list[Item]:
         db_items = self.db.query(ItemModel).filter(
             ItemModel.type == item_type
         ).all()

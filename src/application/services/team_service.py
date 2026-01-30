@@ -1,4 +1,3 @@
-from typing import List, Optional
 from src.domain.repositories.team_repository import TeamRepository
 from src.domain.repositories.trainer_repository import TrainerRepository
 from src.domain.repositories.pokemon_repository import PokemonRepository
@@ -132,7 +131,7 @@ class TeamService:
         self, 
         trainer_id: int, 
         position: int, 
-        exclude_pokemon_id: Optional[int] = None
+        exclude_pokemon_id:  int | None = None
     ) -> None:
         
         team_members = self.team_repository.get_team_by_trainer(trainer_id)

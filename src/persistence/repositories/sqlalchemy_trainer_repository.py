@@ -1,4 +1,3 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
 from src.domain.repositories.trainer_repository import TrainerRepository
 from src.domain.entities.trainer import Trainer, Gender, Region
@@ -21,18 +20,18 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
         
         return self._model_to_entity(db_trainer)
     
-    def get_by_id(self, trainer_id: int) -> Optional[Trainer]:
+    def get_by_id(self, trainer_id: int) -> Trainer | None:
         db_trainer = self.db.query(TrainerModel).filter(
             TrainerModel.id == trainer_id
         ).first()
         
         return self._model_to_entity(db_trainer) if db_trainer else None
     
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Trainer]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Trainer]:
         db_trainers = self.db.query(TrainerModel).offset(skip).limit(limit).all()
         return [self._model_to_entity(trainer) for trainer in db_trainers]
     
-    def update(self, trainer_id: int, trainer: Trainer) -> Optional[Trainer]:
+    def update(self, trainer_id: int, trainer: Trainer) -> Trainer | None:
         db_trainer = self.db.query(TrainerModel).filter(
             TrainerModel.id == trainer_id
         ).first()

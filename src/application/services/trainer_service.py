@@ -1,4 +1,3 @@
-from typing import List, Optional
 from src.domain.repositories.trainer_repository import TrainerRepository
 from src.domain.entities.trainer import Trainer
 from src.application.dtos.trainer_dto import (
@@ -22,15 +21,15 @@ class TrainerService:
         created_trainer = self.trainer_repository.create(trainer)
         return self._transform_to_response_dto(created_trainer)
     
-    def get_trainer(self, trainer_id: int) -> Optional[TrainerResponseDTO]:
+    def get_trainer(self, trainer_id: int) -> TrainerResponseDTO | None:
         trainer = self.trainer_repository.get_by_id(trainer_id)
         return self._transform_to_response_dto(trainer) if trainer else None
     
-    def get_all_trainers(self, skip: int = 0, limit: int = 100) -> List[TrainerResponseDTO]:
+    def get_all_trainers(self, skip: int = 0, limit: int = 100) -> list[TrainerResponseDTO]:
         trainers = self.trainer_repository.get_all(skip, limit)
         return [self._transform_to_response_dto(trainer) for trainer in trainers]
     
-    def update_trainer(self, trainer_id: int, trainer_dto: TrainerUpdateDTO) -> Optional[TrainerResponseDTO]:
+    def update_trainer(self, trainer_id: int, trainer_dto: TrainerUpdateDTO) -> TrainerResponseDTO | None:
         existing_trainer = self.trainer_repository.get_by_id(trainer_id)
         
         if not existing_trainer:

@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from http import HTTPStatus
 from sqlalchemy.orm import Session
@@ -38,7 +37,7 @@ def get_trainer(
         )
     return trainer
 
-@router.get("/", response_model=List[TrainerResponseDTO])
+@router.get("/", response_model=list[TrainerResponseDTO])
 def get_trainers(
     skip: int = 0,
     limit: int = 100,

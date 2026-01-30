@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from ..entities.backpack import Backpack
 
 class BackpackRepository(ABC):
@@ -13,7 +12,7 @@ class BackpackRepository(ABC):
         pass
     
     @abstractmethod
-    def get_trainer_backpack(self, trainer_id: int) -> List[Backpack]:
+    def get_trainer_backpack(self, trainer_id: int) -> list[Backpack]:
         pass
     
     @abstractmethod
@@ -21,7 +20,7 @@ class BackpackRepository(ABC):
         pass
     
     @abstractmethod
-    def update_quantity(self, trainer_id: int, item_id: int, new_quantity: int) -> Optional[Backpack]:
+    def update_quantity(self, trainer_id: int, item_id: int, new_quantity: int) -> Backpack | None:
         pass
     
     @abstractmethod
