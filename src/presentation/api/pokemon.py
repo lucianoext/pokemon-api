@@ -3,7 +3,7 @@ from http import HTTPStatus
 from sqlalchemy.orm import Session
 
 from src.persistence.database import get_database
-from src.persistence.repositories.sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
+from src.persistence.repositories import SqlAlchemyPokemonRepository
 from src.application.services.pokemon_service import PokemonService
 from src.application.dtos.pokemon_dto import (
     PokemonCreateDTO,
@@ -21,14 +21,14 @@ def get_pokemon_service(db: Session = Depends(get_database)) -> PokemonService:
 def create_pokemon(
     pokemon: PokemonCreateDTO,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> PokemonResponseDTO:
     return service.create_pokemon(pokemon)
 
 @router.get("/{pokemon_id}", response_model=PokemonResponseDTO)
 def get_pokemon(
     pokemon_id: int,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> PokemonResponseDTO:
     pokemon = service.get_pokemon(pokemon_id)
     if not pokemon:
         raise HTTPException(
@@ -42,7 +42,7 @@ def get_pokemon_list(
     skip: int = 0,
     limit: int = 100,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> list[PokemonResponseDTO]:
     return service.get_all_pokemon(skip, limit)
 
 @router.put("/{pokemon_id}", response_model=PokemonResponseDTO)
@@ -50,7 +50,7 @@ def update_pokemon(
     pokemon_id: int,
     pokemon: PokemonUpdateDTO,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> PokemonResponseDTO:
     updated_pokemon = service.update_pokemon(pokemon_id, pokemon)
     if not updated_pokemon:
         raise HTTPException(
@@ -63,7 +63,7 @@ def update_pokemon(
 def delete_pokemon(
     pokemon_id: int,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> None:
     success = service.delete_pokemon(pokemon_id)
     if not success:
         raise HTTPException(
@@ -76,7 +76,7 @@ def level_up_pokemon(
     pokemon_id: int,
     levels: int = 1,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> PokemonResponseDTO:
     try:
         return service.level_up_pokemon(pokemon_id, levels)
     except Exception as e:
@@ -91,7 +91,7 @@ def learn_attack(
     new_attack: str,
     replace_attack: str | None = None,
     service: PokemonService = Depends(get_pokemon_service)
-):
+) -> PokemonResponseDTO:
     try:
         return service.learn_new_attack(pokemon_id, new_attack, replace_attack)
     except Exception as e:

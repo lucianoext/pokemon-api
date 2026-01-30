@@ -3,9 +3,11 @@ from http import HTTPStatus
 from sqlalchemy.orm import Session
 
 from src.persistence.database import get_database
-from src.persistence.repositories.sqlalchemy_team_repository import SqlAlchemyTeamRepository
-from src.persistence.repositories.sqlalchemy_trainer_repository import SqlAlchemyTrainerRepository
-from src.persistence.repositories.sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
+from src.persistence.repositories import (
+    SqlAlchemyTeamRepository,
+    SqlAlchemyTrainerRepository,
+    SqlAlchemyPokemonRepository
+)
 from src.application.services.team_service import TeamService
 from src.application.dtos.team_dto import (
     TeamAddPokemonDTO,
@@ -26,7 +28,7 @@ def get_team_service(db: Session = Depends(get_database)) -> TeamService:
 def add_pokemon_to_team(
     team_data: TeamAddPokemonDTO,
     service: TeamService = Depends(get_team_service)
-):
+) -> TeamResponseDTO:
     try:
         return service.add_pokemon_to_team(team_data)
     except (BusinessRuleException, EntityNotFoundException) as e:
@@ -40,7 +42,7 @@ def remove_pokemon_from_team(
     trainer_id: int,
     pokemon_id: int,
     service: TeamService = Depends(get_team_service)
-):
+) -> TeamResponseDTO:
     try:
         return service.remove_pokemon_from_team(trainer_id, pokemon_id)
     except (BusinessRuleException, EntityNotFoundException) as e:
@@ -55,7 +57,7 @@ def update_pokemon_position(
     pokemon_id: int,
     position_data: TeamUpdatePositionDTO,
     service: TeamService = Depends(get_team_service)
-):
+) -> TeamResponseDTO:
     try:
         return service.update_pokemon_position(trainer_id, pokemon_id, position_data)
     except (BusinessRuleException, EntityNotFoundException) as e:
@@ -68,7 +70,7 @@ def update_pokemon_position(
 def get_trainer_team(
     trainer_id: int,
     service: TeamService = Depends(get_team_service)
-):
+) -> TeamResponseDTO:
     try:
         return service.get_trainer_team(trainer_id)
     except EntityNotFoundException as e:

@@ -3,7 +3,7 @@ from http import HTTPStatus
 from sqlalchemy.orm import Session
 
 from src.persistence.database import get_database
-from src.persistence.repositories.sqlalchemy_trainer_repository import SqlAlchemyTrainerRepository
+from src.persistence.repositories import SqlAlchemyTrainerRepository
 from src.application.services.trainer_service import TrainerService
 from src.application.dtos.trainer_dto import (
     TrainerCreateDTO, 
@@ -21,14 +21,14 @@ def get_trainer_service(db: Session = Depends(get_database)) -> TrainerService:
 def create_trainer(
     trainer: TrainerCreateDTO,
     service: TrainerService = Depends(get_trainer_service)
-):
+) -> TrainerResponseDTO:
     return service.create_trainer(trainer)
 
 @router.get("/{trainer_id}", response_model=TrainerResponseDTO)
 def get_trainer(
     trainer_id: int,
     service: TrainerService = Depends(get_trainer_service)
-):
+) -> TrainerResponseDTO:
     trainer = service.get_trainer(trainer_id)
     if not trainer:
         raise HTTPException(
@@ -42,7 +42,7 @@ def get_trainers(
     skip: int = 0,
     limit: int = 100,
     service: TrainerService = Depends(get_trainer_service)
-):
+) -> list[TrainerResponseDTO]:
     return service.get_all_trainers(skip, limit)
 
 @router.put("/{trainer_id}", response_model=TrainerResponseDTO)
@@ -50,7 +50,7 @@ def update_trainer(
     trainer_id: int,
     trainer: TrainerUpdateDTO,
     service: TrainerService = Depends(get_trainer_service)
-):
+) -> TrainerResponseDTO:
     updated_trainer = service.update_trainer(trainer_id, trainer)
     if not updated_trainer:
         raise HTTPException(
@@ -63,7 +63,7 @@ def update_trainer(
 def delete_trainer(
     trainer_id: int,
     service: TrainerService = Depends(get_trainer_service)
-):
+) -> None:
     success = service.delete_trainer(trainer_id)
     if not success:
         raise HTTPException(
