@@ -12,8 +12,8 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
     def create(self, trainer: Trainer) -> Trainer:
         db_trainer = TrainerModel(
             name=trainer.name,
-            gender=trainer.gender.value,
-            region=trainer.region.value
+            gender=self._get_enum_value(trainer.gender),
+            region=self._get_enum_value(trainer.region)
         )
         self.db.add(db_trainer)
         self.db.commit()
@@ -41,8 +41,8 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
             return None
         
         db_trainer.name = trainer.name
-        db_trainer.gender = trainer.gender.value
-        db_trainer.region = trainer.region.value
+        db_trainer.gender = self._get_enum_value(trainer.gender)
+        db_trainer.region = self._get_enum_value(trainer.region)
         
         self.db.commit()
         self.db.refresh(db_trainer)
@@ -68,3 +68,9 @@ class SqlAlchemyTrainerRepository(TrainerRepository):
             gender=Gender(model.gender),
             region=Region(model.region)
         )
+    
+    def _get_enum_value(self, field) -> str:
+        if hasattr(field, 'value'):
+            return field.value 
+        else:
+            return str(field)

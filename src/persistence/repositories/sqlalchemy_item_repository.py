@@ -12,7 +12,7 @@ class SqlAlchemyItemRepository(ItemRepository):
     def create(self, item: Item) -> Item:
         db_item = ItemModel(
             name=item.name,
-            type=item.type.value,
+            type=self._get_enum_value(item.type),
             description=item.description,
             price=item.price
         )
@@ -43,7 +43,7 @@ class SqlAlchemyItemRepository(ItemRepository):
             return None
         
         db_item.name = item.name
-        db_item.type = item.type.value
+        db_item.type = self._get_enum_value(item.type)
         db_item.description = item.description
         db_item.price = item.price
         
@@ -78,3 +78,12 @@ class SqlAlchemyItemRepository(ItemRepository):
             description=model.description,
             price=model.price
         )
+    
+    def _get_enum_value(self, field) -> str:
+
+        if field is None:
+            return None
+        if hasattr(field, 'value'):
+            return field.value
+        else:
+            return str(field)

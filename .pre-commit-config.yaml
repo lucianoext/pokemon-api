@@ -1,0 +1,70 @@
+# Pre-commit hooks configuration
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.7
+    hooks:
+      - id: ruff
+        name: "Ruff Linter"
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^src/
+      
+      - id: ruff-format
+        name: "Ruff Formatter"
+        files: ^src/
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        name: "MyPy Type Checking"
+        files: ^src/
+        additional_dependencies:
+          - fastapi
+          - sqlmodel
+          - pydantic
+        args: [--ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: "Pylint"
+        entry: pylint
+        language: system
+        files: ^src/.*\.py$
+        args: [--output-format=colorized]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+        name: "Check Python AST"
+      
+      - id: check-yaml
+        name: "Check YAML files"
+      
+      - id: check-json
+        name: "Check JSON files"
+      
+      - id: check-merge-conflict
+        name: "Check merge conflicts"
+      
+      - id: trailing-whitespace
+        name: "Remove trailing whitespace"
+      
+      - id: end-of-file-fixer
+        name: "Fix end of files"
+      
+      - id: check-added-large-files
+        name: "Check large files"
+        args: ['--maxkb=1000']
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: '1.8.0'
+    hooks:
+      - id: bandit
+        name: "Bandit Security Linter"
+        files: ^src/
+        args: ['-r', '-f', 'json']
+
+default_stages: [commit, push]
+fail_fast: false

@@ -13,10 +13,10 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
     def create(self, pokemon: Pokemon) -> Pokemon:
         db_pokemon = PokemonModel(
             name=pokemon.name,
-            type_primary=pokemon.type_primary.value,
-            type_secondary=pokemon.type_secondary.value if pokemon.type_secondary else None,
+            type_primary=self._get_enum_value(pokemon.type_primary),  # ← CAMBIO
+            type_secondary=self._get_enum_value(pokemon.type_secondary) if pokemon.type_secondary else None,  # ← CAMBIO
             attacks=json.dumps(pokemon.attacks),
-            nature=pokemon.nature.value,
+            nature=self._get_enum_value(pokemon.nature),  # ← CAMBIO
             level=pokemon.level
         )
         
@@ -46,10 +46,10 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
             return None
         
         db_pokemon.name = pokemon.name
-        db_pokemon.type_primary = pokemon.type_primary.value
-        db_pokemon.type_secondary = pokemon.type_secondary.value if pokemon.type_secondary else None
+        db_pokemon.type_primary = self._get_enum_value(pokemon.type_primary)
+        db_pokemon.type_secondary = self._get_enum_value(pokemon.type_secondary) if pokemon.type_secondary else None
         db_pokemon.attacks = json.dumps(pokemon.attacks)
-        db_pokemon.nature = pokemon.nature.value
+        db_pokemon.nature = self._get_enum_value(pokemon.nature)
         db_pokemon.level = pokemon.level
         
         self.db.commit()
@@ -99,9 +99,16 @@ class SqlAlchemyPokemonRepository(PokemonRepository):
         return PokemonModel(
             id=pokemon.id,
             name=pokemon.name,
-            type_primary=pokemon.type_primary.value,
-            type_secondary=pokemon.type_secondary.value if pokemon.type_secondary else None,
+            type_primary=self._get_enum_value(pokemon.type_primary),
+            type_secondary=self._get_enum_value(pokemon.type_secondary) if pokemon.type_secondary else None,
             attacks=json.dumps(pokemon.attacks),
-            nature=pokemon.nature.value,
-            level=pokemon.level
+            nature=self._get_enum_value(pokemon.nature),
         )
+    
+    def _get_enum_value(self, field) -> str:
+        if field is None:
+            return None
+        if hasattr(field, 'value'):
+            return field.value
+        else:
+            return str(field)

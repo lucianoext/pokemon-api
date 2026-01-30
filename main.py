@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.persistence.database.connection import engine, Base
+from src.persistence.database.connection import create_tables
 from src.presentation.api.trainers import router as trainers_router
 from src.presentation.api.pokemon import router as pokemon_router
 from src.presentation.api.items import router as items_router
 from src.presentation.api.teams import router as teams_router
 from src.presentation.api.backpacks import router as backpacks_router
 
-Base.metadata.create_all(bind=engine)
+create_tables()
 
 app = FastAPI(
     title="Pokemon API",

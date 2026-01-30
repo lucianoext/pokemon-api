@@ -10,3 +10,16 @@ services:
     environment:
       - ENVIRONMENT=development
     restart: unless-stopped
+  
+  pokemon-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/app
+      - ./pokemon.db:/app/pokemon.db
+    environment:
+      - ENVIRONMENT=development
+    profiles: ["dev"]

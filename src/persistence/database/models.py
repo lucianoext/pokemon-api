@@ -1,61 +1,66 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from .connection import Base
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List
+from datetime import datetime
 
-class TrainerModel(Base):
+class TrainerModel(SQLModel, table=True):
+    
     __tablename__ = "trainers"
     
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False)
-    gender = Column(String(10), nullable=False)
-    region = Column(String(20), nullable=False)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(max_length=100, index=True)
+    gender: str = Field(max_length=10)
+    region: str = Field(max_length=20, index=True)
     
-    team_members = relationship("TeamModel", back_populates="trainer")
-    backpack_items = relationship("BackpackModel", back_populates="trainer")
+    team_members: List["TeamModel"] = Relationship(back_populates="trainer")
+    backpack_items: List["BackpackModel"] = Relationship(back_populates="trainer")
 
-class PokemonModel(Base):
+class PokemonModel(SQLModel, table=True):
+
     __tablename__ = "pokemon"
     
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), nullable=False)
-    type_primary = Column(String(20), nullable=False)
-    type_secondary = Column(String(20), nullable=True)
-    attacks = Column(Text, nullable=False)
-    nature = Column(String(20), nullable=False)
-    level = Column(Integer, default=1)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(max_length=50, index=True)
+    type_primary: str = Field(max_length=20, index=True)
+    type_secondary: Optional[str] = Field(default=None, max_length=20, index=True)
+    attacks: str = Field(description="JSON string of attacks")
+    nature: str = Field(max_length=20, index=True)
+    level: int = Field(default=1, ge=1, le=100)
     
-    team_memberships = relationship("TeamModel", back_populates="pokemon")
+    team_memberships: List["TeamModel"] = Relationship(back_populates="pokemon")
 
-class TeamModel(Base):
+class TeamModel(SQLModel, table=True):
+    
     __tablename__ = "teams"
     
-    id = Column(Integer, primary_key=True, index=True)
-    trainer_id = Column(Integer, ForeignKey("trainers.id"), nullable=False)
-    pokemon_id = Column(Integer, ForeignKey("pokemon.id"), nullable=False)
-    position = Column(Integer, nullable=False)
-    is_active = Column(Boolean, default=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    trainer_id: int = Field(foreign_key="trainers.id", index=True)
+    pokemon_id: int = Field(foreign_key="pokemon.id", index=True)
+    position: int = Field(ge=1, le=6, description="Position in team (1-6)")
+    is_active: bool = Field(default=True)
     
-    trainer = relationship("TrainerModel", back_populates="team_members")
-    pokemon = relationship("PokemonModel", back_populates="team_memberships")
+    trainer: TrainerModel = Relationship(back_populates="team_members")
+    pokemon: PokemonModel = Relationship(back_populates="team_memberships")
 
-class ItemModel(Base):
+class ItemModel(SQLModel, table=True):
+
     __tablename__ = "items"
     
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), nullable=False)
-    type = Column(String(20), nullable=False)
-    description = Column(Text, nullable=True)
-    price = Column(Integer, default=0)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(max_length=50, index=True)
+    type: str = Field(max_length=20, index=True)
+    description: Optional[str] = Field(default=None)
+    price: int = Field(default=0, ge=0, description="Price in Pokemon zenis")
     
-    backpack_entries = relationship("BackpackModel", back_populates="item")
+    backpack_entries: List["BackpackModel"] = Relationship(back_populates="item")
 
-class BackpackModel(Base):
+class BackpackModel(SQLModel, table=True):
+    
     __tablename__ = "backpacks"
     
-    id = Column(Integer, primary_key=True, index=True)
-    trainer_id = Column(Integer, ForeignKey("trainers.id"), nullable=False)
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
-    quantity = Column(Integer, default=1)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    trainer_id: int = Field(foreign_key="trainers.id", index=True)
+    item_id: int = Field(foreign_key="items.id", index=True)
+    quantity: int = Field(default=1, ge=0, le=999, description="Quantity owned")
     
-    trainer = relationship("TrainerModel", back_populates="backpack_items")
-    item = relationship("ItemModel", back_populates="backpack_entries")
+    trainer: TrainerModel = Relationship(back_populates="backpack_items")
+    item: ItemModel = Relationship(back_populates="backpack_entries")
