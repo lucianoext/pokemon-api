@@ -1,19 +1,19 @@
 from dataclasses import dataclass
-from src.domain.enums.pokemon_enums import PokemonNature, PokemonType
 
+from src.domain.enums.pokemon_enums import PokemonNature, PokemonType
 
 
 @dataclass
 class Pokemon:
-    id:  int | None
+    id: int | None
     name: str
     type_primary: PokemonType
     type_secondary: PokemonType | None
-    attacks: str
+    attacks: list[str]
     nature: PokemonNature
     level: int = 1
-    
-    def __post_init__(self):
+
+    def __post_init__(self) -> None:
         if isinstance(self.type_primary, str):
             self.type_primary = PokemonType(self.type_primary)
         if isinstance(self.type_secondary, str):

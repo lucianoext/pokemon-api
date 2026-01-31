@@ -1,18 +1,22 @@
 from pydantic import BaseModel
 
+
 class BackpackAddItemDTO(BaseModel):
     trainer_id: int
     item_id: int
     quantity: int = 1
 
+
 class BackpackRemoveItemDTO(BaseModel):
     quantity: int = 1
+
 
 class BackpackUpdateQuantityDTO(BaseModel):
     new_quantity: int
 
+
 class BackpackItemResponseDTO(BaseModel):
-    id: int
+    id: int | None
     trainer_id: int
     item_id: int
     item_name: str
@@ -20,6 +24,7 @@ class BackpackItemResponseDTO(BaseModel):
     item_description: str
     item_price: int
     quantity: int
+
 
 class BackpackResponseDTO(BaseModel):
     trainer_id: int

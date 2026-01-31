@@ -21,6 +21,7 @@ class PokemonType(str, Enum):
     STEEL = "steel"
     FAIRY = "fairy"
 
+
 class PokemonNature(str, Enum):
     HARDY = "hardy"
     LONELY = "lonely"

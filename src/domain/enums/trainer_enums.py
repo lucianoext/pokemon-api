@@ -6,6 +6,7 @@ class Gender(str, Enum):
     FEMALE = "female"
     OTHER = "other"
 
+
 class Region(str, Enum):
     KANTO = "kanto"
     JOHTO = "johto"

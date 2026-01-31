@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class Backpack:
-    id:  int | None
+    id: int | None
     trainer_id: int
     item_id: int
     quantity: int
-    
-    def __post_init__(self):
+
+    def __post_init__(self) -> None:
         if self.quantity < 0:
             raise ValueError("Quantity cannot be negative")

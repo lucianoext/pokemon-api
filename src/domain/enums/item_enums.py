@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ItemType(str, Enum):
     POKEBALL = "pokeball"
     ANTIDOTE = "antidote"
