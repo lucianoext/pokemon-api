@@ -9,6 +9,7 @@ services:
       - ./pokemon.db:/app/pokemon.db
     environment:
       - ENVIRONMENT=development
+      - PYTHONPATH=/app:/app/src
     restart: unless-stopped
 
   pokemon-api-dev:
@@ -20,5 +21,17 @@ services:
       - ./pokemon.db:/app/pokemon.db
     environment:
       - ENVIRONMENT=development
-    command: ["poetry", "run", "dev"]
+      - PYTHONPATH=/app:/app/src
+    command: ["uv", "run", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
     profiles: ["dev"]
+
+  pokemon-seed:
+    build: .
+    volumes:
+      - ./pokemon.db:/app/pokemon.db
+    environment:
+      - PYTHONPATH=/app:/app/src
+    command: ["uv", "run", "python", "scripts/seed_data.py"]
+    profiles: ["seed"]
+    depends_on:
+      - pokemon-api

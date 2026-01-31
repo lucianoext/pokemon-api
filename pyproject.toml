@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [dependency-groups]
 test = [
@@ -43,13 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-start = "python main.py"
-dev = "uvicorn main:app --reload --host 127.0.0.1 --port 8000"
-test = "pytest tests/ -v"
-lint = "ruff check src/"
-format = "ruff format src/"
-type-check = "mypy src/"
-pylint-check = "pylint src/"
+pokemon-api = "main:main"
 
 [tool.ruff]
 line-length = 88
@@ -130,4 +124,10 @@ ignore-paths = [
     "src/persistence/database/models.py"
 ]
 
-fail-under = 9.0  # Permitir commit si score >= 9.0
+fail-under = 9.0
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""

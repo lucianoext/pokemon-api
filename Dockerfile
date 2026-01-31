@@ -2,14 +2,16 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY pyproject.toml ./
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-RUN pip install poetry
-RUN poetry config virtualenvs.create false
+COPY pyproject.toml uv.lock* README.md ./
 
-RUN poetry install --only main --no-root
+RUN uv sync --frozen --no-dev --no-cache
 
 COPY . .
 
+ENV PYTHONPATH="/app:/app/src"
+
 EXPOSE 8000
-CMD ["poetry", "run", "start"]
+
+CMD ["uv", "run", "python", "main.py"]
