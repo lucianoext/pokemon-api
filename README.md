@@ -35,15 +35,6 @@ It uses **FastAPI**, **SQLModel/SQLAlchemy**, a well‑structured **Clean Archit
 
 This project follows **Clean Architecture**, separating concerns into clear layers:
 
-``
-
-src/
-├── api/               # FastAPI routers and request/response handling
-├── core/              # Configurations and settings
-├── persistence/        # Database models and repositories
-├── services/           # Business logic layer
-├── schemas/            # Pydantic/SQLModel schemas
-└── main.py             # Application entrypoint
 
 ### Layers
 - **Models** → SQLAlchemy/SQLModel entities
@@ -71,8 +62,8 @@ src/
 - **Seed script:** [scripts/seed_data.py](scripts/seed_data.py)
 
 ## Requirements
-- **Dependencies:** see `dependencias_actuales.txt`
-- **Dev dependencies:** see `dependencias_dev.txt`
+- **Dependencies:** see `dependencies.txt`
+- **Dev dependencies:** see `dependencies_dev.txt`
 
 ## Getting Started (Docker — recommended)
 
@@ -85,7 +76,7 @@ This project is set up to run with Docker Compose. The Docker-first workflow ens
 ### Quick start
 ```bash
 # clone
-git clone <your-repo-url>  # or use your existing local copy
+git clone https://github.com/lucianoext/pokemon-api.git
 cd pokemon-api
 
 # create a `.env` file with your database connection string if you want to use other database
@@ -153,7 +144,7 @@ python -m venv .venv
 # macOS / Linux
 source .venv/bin/activate
 
-pip install -r dependencias_actuales.txt
+pip install -r dependencies.txt
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
