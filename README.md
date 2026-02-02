@@ -5,7 +5,7 @@ A FastAPI-based Pokémon management system for Pokemon, trainers, teams and back
 ## Project Overview
 
 The **Pokémon API** is a RESTful backend designed to manage trainers, Pokémon, items, teams, and inventories.
-It uses **FastAPI**, **SQLModel/SQLAlchemy**, and a well‑structured **Clean Architecture** approach to ensure scalability and maintainability.
+It uses **FastAPI**, **SQLModel/SQLAlchemy**, a well‑structured **Clean Architecture** approach to ensure scalability and maintainability and Alembic migrations for database schema management.
 
 ## Features
 
@@ -88,8 +88,14 @@ This project is set up to run with Docker Compose. The Docker-first workflow ens
 git clone <your-repo-url>  # or use your existing local copy
 cd pokemon-api
 
+# create a `.env` file with your database connection string if you want to use other database
+DATABASE_URL=postgresql://username:password@host:port/database
+
 # start the app and related services
 docker compose up --build
+
+# Run database migrations:
+docker compose exec api alembic upgrade head
 ```
 
 By default the API will be available at:
@@ -169,8 +175,32 @@ API docs: http://127.0.0.1:8000/docs
 - **Connection / session:** [src/persistence/database/connection.py](src/persistence/database/connection.py)
 - **SQLAlchemy repositories:** [src/persistence/repositories](src/persistence/repositories)
 
+## Running Migrations
+
+### To create a new migration:
+
+```bash
+docker compose exec api alembic revision --autogenerate -m "description of changes"
+```
+
+To apply migrations:
+
+```bash
+docker compose exec api alembic upgrade head
+```
+
+To rollback migrations:
+
+```bash
+docker compose exec api alembic downgrade -1
+```
+
 ## Scripts
 - **Seed DB:** [scripts/seed_data.py](scripts/seed_data.py)
 
 ## Contribution
 - Open issues or PRs; follow the project layering and style.
+
+## Database Schema
+
+For detailed information about the database schema and relationships, see [Database Diagrams](docs/diagrams.md).
