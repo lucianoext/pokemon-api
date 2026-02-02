@@ -65,7 +65,7 @@ repos:
       - id: mypy
         stages:
           - pre-commit
-        exclude: (^src/playground/|^examples/|^tests/)
+        exclude: (^src/playground/|^examples/|^tests/|^alembic/)
         additional_dependencies:
           - "pydantic==2.12.5"
           - "pydantic-settings==2.12.0"
