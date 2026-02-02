@@ -203,4 +203,4 @@ docker compose exec api alembic downgrade -1
 
 ## Database Schema
 
-For detailed information about the database schema and relationships, see [Database Diagrams](docs/diagrams.md).
+For detailed information about the database schema and relationships, see [Database Diagrams](docs/Mermaid Chart.png).
