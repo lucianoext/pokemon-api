@@ -1,25 +1,19 @@
-# 📘 Pokémon API
-*A FastAPI-based Pokémon management system following Clean Architecture.*
+# Pokemon API
 
----
+A FastAPI-based Pokémon management system for Pokemon, trainers, teams and backpacks using a layered architecture in Python.
 
-## 📌 Project Overview
+## Project Overview
 
 The **Pokémon API** is a RESTful backend designed to manage trainers, Pokémon, items, teams, and inventories.
 It uses **FastAPI**, **SQLModel/SQLAlchemy**, and a well‑structured **Clean Architecture** approach to ensure scalability and maintainability.
 
-### 🔗 Repository
-https://github.com/lucianoext/pokemon-api
+## Features
 
----
-
-## ✨ Features
-
-### 👤 Trainers
+### Trainers
 - Create and manage Pokémon trainers
 - Manage trainer backpacks and team composition
 
-### 🐾 Pokémon
+### Pokémon
 - Add and manage Pokémon with:
   - Types
   - Stats
@@ -27,19 +21,17 @@ https://github.com/lucianoext/pokemon-api
   - Attacks
   - Levels
 
-### 🎒 Items & Backpack
+### Items & Backpack
 - Manage items with pricing
 - Track trainer inventory
 - Modify item quantities
 
-### 🧩 Teams
+### Teams
 - Manage trainer teams (max 6 Pokémon)
 - Swap Pokémon
 - Validate limits
 
----
-
-## 🏛️ Architecture
+## Architecture
 
 This project follows **Clean Architecture**, separating concerns into clear layers:
 
@@ -62,76 +54,123 @@ src/
 
 ---
 
-## 🚀 Getting Started
+## Technologies
+- **Language:** Python 3.10+
+- **Framework:** FastAPI (app entry: [main.py](main.py))
+- **ORM:** SQLModel  (models: [src/persistence/database/models.py](src/persistence/database/models.py))
+- **Containers:** Docker / Docker Compose ([Dockerfile](Dockerfile), [docker-compose.yaml](docker-compose.yaml))
 
-You can run the project in two ways:
+## Repository Structure (key files)
+- **Entry:** [main.py](main.py)
+- **Config:** [src/config.py](src/config.py)
+- **API routes:** [src/presentation/api/pokemon.py](src/presentation/api/pokemon.py), [src/presentation/api/trainers.py](src/presentation/api/trainers.py), [src/presentation/api/items.py](src/presentation/api/items.py), [src/presentation/api/teams.py](src/presentation/api/teams.py), [src/presentation/api/backpacks.py](src/presentation/api/backpacks.py)
+- **Services:** [src/application/services](src/application/services)
+- **DTOs:** [src/application/dtos](src/application/dtos)
+- **Domain entities:** [src/domain/entities](src/domain/entities)
+- **Persistence / Repositories:** [src/persistence/repositories](src/persistence/repositories)
+- **Seed script:** [scripts/seed_data.py](scripts/seed_data.py)
+
+## Requirements
+- **Dependencies:** see `dependencias_actuales.txt`
+- **Dev dependencies:** see `dependencias_dev.txt`
+
+## Getting Started (Docker — recommended)
+
+This project is set up to run with Docker Compose. The Docker-first workflow ensures the app, database and other services run consistently across machines.
+
+### Prerequisites
+- Docker
+- Docker Compose (v2 recommended)
+
+### Quick start
+```bash
+# clone
+git clone <your-repo-url>  # or use your existing local copy
+cd pokemon-api
+
+# start the app and related services
+docker compose up --build
+```
+
+By default the API will be available at:
+
+- http://localhost:8000
+- OpenAPI docs: http://localhost:8000/docs
+
+### Dev mode (hot reload)
+If your compose file includes a development service or profile (common names: `dev`, `pokemon-api-dev`, or `pokemon-api`), run:
+
+```bash
+docker compose --profile dev up --build
+```
+
+or start only the API service (if named `pokemon-api`):
+
+```bash
+docker compose up --build pokemon-api
+```
+
+### Seed the database
+If a seed service exists (e.g. `pokemon-seed`) you can run:
+
+```bash
+docker compose run --rm pokemon-seed
+```
+
+(Check `docker-compose.yaml` for the exact service name used in this repository.)
+
+### Common Docker commands
+
+```bash
+# Rebuild images
+docker compose build --no-cache
+
+# Run in background
+docker compose up -d
+
+# Show logs
+docker compose logs -f
+
+# Stop and remove containers
+docker compose down
+```
+
+## Local development (optional)
+If you prefer running locally without Docker, create a virtualenv and install dependencies:
+
+```bash
+python -m venv .venv
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+# Windows CMD
+.venv\Scripts\activate.bat
+# macOS / Linux
+source .venv/bin/activate
+
+pip install -r dependencias_actuales.txt
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
+
+API docs: http://127.0.0.1:8000/docs
 
 ---
 
-# 🐳 Option 1: Run with Docker (Recommended)
+## Models & DTOs
+- **Persistence models:** [src/persistence/database/models.py](src/persistence/database/models.py)
+- **Domain entities examples:** [src/domain/entities/pokemon.py](src/domain/entities/pokemon.py), [src/domain/entities/trainer.py](src/domain/entities/trainer.py)
+- **DTOs:** [src/application/dtos/pokemon_dto.py](src/application/dtos/pokemon_dto.py), [src/application/dtos/trainer_dto.py](src/application/dtos/trainer_dto.py)
 
-### 🔧 Prerequisites
-- Docker
-- Docker Compose
+## Endpoints summary
+- **Pokémon:** CRUD and queries — see [src/presentation/api/pokemon.py](src/presentation/api/pokemon.py)
+- **Trainers:** CRUD — see [src/presentation/api/trainers.py](src/presentation/api/trainers.py)
+- **Items / Backpacks / Teams:** see respective files under [src/presentation/api](src/presentation/api)
 
-### ▶️ Quick Start
-```bash
-# Clone the repository
-git clone https://github.com/lucianoext/pokemon-api
-cd pokemon-api
+## Persistence
+- **Connection / session:** [src/persistence/database/connection.py](src/persistence/database/connection.py)
+- **SQLAlchemy repositories:** [src/persistence/repositories](src/persistence/repositories)
 
-# Start with Docker Compose
-docker-compose up --build
+## Scripts
+- **Seed DB:** [scripts/seed_data.py](scripts/seed_data.py)
 
-API available at:
-http://localhost:8000
-
-🧪 Developer Mode (Hot Reload)
-docker-compose --profile dev up --build pokemon-a
-
-Runs at:
-http://localhost:8001
-
-Common Docker Commands
-
-# Run production
-docker-compose up --build
-
-# Run detached
-docker-compose up -d
-
-# Show logs
-docker-compose logs -f
-
-# Rebuild everything
-docker-compose build --no-cache
-
-# Stop containers
-docker-compose down
-
-# Desarrollo
-uv run uvicorn main:app --reload --host 127.0.0.1 --port 8000
-
-# Tests
-uv run --group test pytest tests/ -v
-
-# Linting completo
-uv run --group linting ruff check src/ && uv run --group linting mypy src/
-
-# Construir y ejecutar
-docker-compose up --build
-
-# Solo desarrollo (con hot reload)
-docker-compose --profile dev up --build pokemon-api-dev
-
-# Ejecutar seed de datos
-docker-compose --profile seed up pokemon-seed
-
-# En background
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f pokemon-api
-
-# Reconstruir sin cache
-docker-compose build --no-cache
+## Contribution
+- Open issues or PRs; follow the project layering and style.
