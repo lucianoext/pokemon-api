@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -11,6 +14,8 @@ class TrainerModel(SQLModel, table=True):
 
     team_members: list["TeamModel"] = Relationship(back_populates="trainer")
     backpack_items: list["BackpackModel"] = Relationship(back_populates="trainer")
+
+    user: Optional["UserModel"] = Relationship(back_populates="trainer")
 
 
 class PokemonModel(SQLModel, table=True):
@@ -62,3 +67,30 @@ class BackpackModel(SQLModel, table=True):
 
     trainer: TrainerModel = Relationship(back_populates="backpack_items")
     item: ItemModel = Relationship(back_populates="backpack_entries")
+
+
+class UserModel(SQLModel, table=True):
+    __tablename__ = "users"
+
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(unique=True, index=True, max_length=50)
+    email: str = Field(unique=True, index=True, max_length=100)
+    hashed_password: str = Field(max_length=255)
+    is_active: bool = Field(default=True)
+    is_superuser: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    trainer_id: int | None = Field(default=None, foreign_key="trainers.id")
+    trainer: Optional["TrainerModel"] = Relationship(back_populates="user")
+
+
+class RefreshTokenModel(SQLModel, table=True):
+    __tablename__ = "refresh_tokens"
+
+    id: int | None = Field(default=None, primary_key=True)
+    token: str = Field(unique=True, index=True, max_length=255)
+    user_id: int = Field(foreign_key="users.id")
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_revoked: bool = Field(default=False)

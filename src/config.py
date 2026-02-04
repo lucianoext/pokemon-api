@@ -14,5 +14,10 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
 
+    JWT_SECRET_KEY: str = "xUveziac6WsovSJgvpMfaKWTBQbP0Rsy2ZWYEaJaEhA"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
 
 settings = Settings()

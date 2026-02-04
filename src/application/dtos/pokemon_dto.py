@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.domain.enums import PokemonNature, PokemonType  # Corregir import
+from src.domain.enums import PokemonNature, PokemonType
 
 
 class PokemonCreateDTO(BaseModel):

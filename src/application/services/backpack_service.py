@@ -108,7 +108,7 @@ class BackpackService:
                     item_id=backpack_item.item_id,
                     item_name=item.name,
                     item_type=item.type.value,
-                    item_description=item.description or "",  # ✅ Agregar coma faltante
+                    item_description=item.description or "",
                     item_price=item.price,
                     quantity=backpack_item.quantity,
                 )

@@ -9,6 +9,8 @@ class Trainer:
     name: str
     gender: Gender
     region: Region
+    user_id: int | None = None
+    username: str | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.gender, str):
