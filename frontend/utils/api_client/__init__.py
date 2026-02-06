@@ -5,6 +5,7 @@ from typing import Any
 from .auth_client import AuthClient
 from .backpacks_client import BackpacksClient
 from .base_client import BaseAPIClient
+from .battles_client import BattlesClient
 from .items_client import ItemsClient
 from .pokemon_client import PokemonClient
 from .teams_client import TeamsClient
@@ -24,6 +25,7 @@ class APIClient:
         self.teams = TeamsClient(base_url)
         self.items = ItemsClient(base_url)
         self.backpacks = BackpacksClient(base_url)
+        self.battles = BattlesClient(base_url)  # ADD THIS
 
     def __getattr__(self, name: str) -> Any:
         """Delegate method calls to appropriate clients."""
@@ -35,6 +37,7 @@ class APIClient:
             self.teams,
             self.items,
             self.backpacks,
+            self.battles,  # ADD THIS
         ]:
             if hasattr(client, name):
                 return getattr(client, name)
@@ -42,6 +45,7 @@ class APIClient:
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
 
+    # Health check and dashboard stats from base
     def health_check(self) -> dict[str, Any]:
         """Check API health status."""
         result = self.base.health_check()

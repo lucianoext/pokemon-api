@@ -17,6 +17,20 @@ class TrainerModel(SQLModel, table=True):
 
     user: Optional["UserModel"] = Relationship(back_populates="trainer")
 
+    # Add these missing battle relationships:
+    battles_as_team1: list["BattleModel"] = Relationship(
+        back_populates="team1_trainer",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team1_trainer_id]"},
+    )
+    battles_as_team2: list["BattleModel"] = Relationship(
+        back_populates="team2_trainer",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team2_trainer_id]"},
+    )
+    battles_won: list["BattleModel"] = Relationship(
+        back_populates="winner_trainer",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.winner_trainer_id]"},
+    )
+
 
 class PokemonModel(SQLModel, table=True):
     __tablename__ = "pokemon"
@@ -94,3 +108,33 @@ class RefreshTokenModel(SQLModel, table=True):
     expires_at: datetime
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_revoked: bool = Field(default=False)
+
+
+class BattleModel(SQLModel, table=True):
+    __tablename__ = "battles"
+
+    id: int | None = Field(default=None, primary_key=True)
+    team1_trainer_id: int = Field(foreign_key="trainers.id", index=True)
+    team2_trainer_id: int = Field(foreign_key="trainers.id", index=True)
+    winner_trainer_id: int = Field(foreign_key="trainers.id", index=True)
+    team1_strength: float = Field(description="Team 1 calculated strength")
+    team2_strength: float = Field(description="Team 2 calculated strength")
+    victory_margin: float = Field(description="Difference in strength")
+    battle_date: datetime = Field(default_factory=datetime.utcnow, index=True)
+    battle_details: str | None = Field(
+        default=None, description="JSON string with battle details"
+    )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    team1_trainer: Optional["TrainerModel"] = Relationship(
+        back_populates="battles_as_team1",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team1_trainer_id]"},
+    )
+    team2_trainer: Optional["TrainerModel"] = Relationship(
+        back_populates="battles_as_team2",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team2_trainer_id]"},
+    )
+    winner_trainer: Optional["TrainerModel"] = Relationship(
+        back_populates="battles_won",
+        sa_relationship_kwargs={"foreign_keys": "[BattleModel.winner_trainer_id]"},
+    )

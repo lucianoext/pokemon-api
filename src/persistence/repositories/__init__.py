@@ -1,4 +1,5 @@
 from .sqlalchemy_backpack_repository import SqlAlchemyBackpackRepository
+from .sqlalchemy_battle_repository import SqlAlchemyBattleRepository
 from .sqlalchemy_item_repository import SqlAlchemyItemRepository
 from .sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
 from .sqlalchemy_team_repository import SqlAlchemyTeamRepository
@@ -12,4 +13,5 @@ __all__ = [
     "SqlAlchemyItemRepository",
     "SqlAlchemyBackpackRepository",
     "SqlAlchemyUserRepository",
+    "SqlAlchemyBattleRepository",
 ]
