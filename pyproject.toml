@@ -134,7 +134,14 @@ module = [
 ]
 ignore_errors = true
 
-[tool.pylint.messages_control]
+[tool.pylint.MASTER]
+jobs = 1
+
+[tool.pylint.FORMAT]
+max-line-length = 88
+output-format = "text"
+
+[tool.pylint.MESSAGES_CONTROL]
 disable = [
     "missing-docstring",
     "too-few-public-methods",
@@ -148,10 +155,27 @@ disable = [
     "wrong-import-order",
     "broad-exception-caught",
     "redefined-outer-name",
+    "duplicate-code",  # R0801 - Disable duplicate code warnings
+    "too-many-instance-attributes",  # R0902
+    "too-many-return-statements",  # R0911
+    "unused-variable",  # W0612 - We already handle this with ruff
 ]
 
-[tool.pylint.format]
-max-line-length = 88
+[tool.pylint.DESIGN]
+max-attributes = 10
+max-returns = 8
+max-branches = 15
+max-locals = 18
+max-statements = 55
+
+[tool.pylint.SIMILARITIES]
+min-similarity-lines = 15
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = true
+
+[tool.pylint.REPORTS]
+output-format = "colorized"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,5 +1,7 @@
 import os
 import sys
+import threading
+import time
 from datetime import datetime
 from typing import Any
 
@@ -19,6 +21,7 @@ from utils.session_state import init_session_state, is_authenticated, logout_use
 
 
 def main() -> None:
+    """Main application entry point."""
     st.set_page_config(
         page_title="Pokémon Management System",
         page_icon="⚡",
@@ -44,9 +47,7 @@ def main() -> None:
     )
 
     init_session_state()
-
     inject_custom_css()
-
     check_api_connectivity()
 
     if is_authenticated():
@@ -56,7 +57,7 @@ def main() -> None:
 
 
 def inject_custom_css() -> None:
-    """Custom CSS"""
+    """Inject custom CSS styles."""
     st.markdown(
         """
     <style>
@@ -189,6 +190,7 @@ def inject_custom_css() -> None:
 
 
 def check_api_connectivity() -> None:
+    """Check API connectivity and show status."""
     if "api_status_checked" not in st.session_state:
         try:
             health_status = api_client.health_check()
@@ -213,6 +215,7 @@ def check_api_connectivity() -> None:
 
 
 def show_authenticated_app() -> None:
+    """Show the main authenticated application."""
     show_sidebar_navigation()
 
     current_page = st.session_state.get("current_page", "dashboard")
@@ -234,88 +237,102 @@ def show_authenticated_app() -> None:
 
 
 def show_sidebar_navigation() -> None:
+    """Show sidebar navigation and user information."""
     with st.sidebar:
-        user_info = st.session_state.get("user_info", {})
-
+        _show_user_info()
         st.markdown("---")
-        st.markdown("### 👤 Current User")
+        _show_navigation_menu()
+        st.markdown("---")
+        _show_system_status()
+        _show_quick_stats()
+        st.markdown("---")
+        _show_sidebar_actions()
 
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.markdown(f"**{user_info.get('username', 'User')}**")
-            user_type = "👑 Admin" if user_info.get("is_superuser") else "👤 User"
-            st.caption(user_type)
 
-        with col2:
-            if st.button("🚪", help="Log out", key="logout_btn"):
-                logout_user()
+def _show_user_info() -> None:
+    """Show current user information in sidebar."""
+    user_info = st.session_state.get("user_info", {})
+
+    st.markdown("### 👤 Current User")
+
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown(f"**{user_info.get('username', 'User')}**")
+        user_type = "👑 Admin" if user_info.get("is_superuser") else "👤 User"
+        st.caption(user_type)
+
+    with col2:
+        if st.button("🚪", help="Log out", key="logout_btn"):
+            logout_user()
+            st.rerun()
+
+
+def _show_navigation_menu() -> None:
+    """Show navigation menu in sidebar."""
+    st.markdown("### 🧭 Navigation")
+
+    current_page = st.session_state.get("current_page", "dashboard")
+
+    pages = {
+        "dashboard": {
+            "icon": "🏠",
+            "title": "Dashboard",
+            "desc": "General overview",
+        },
+        "trainers": {"icon": "👥", "title": "Trainers", "desc": "Manage trainers"},
+        "pokemon": {"icon": "⚡", "title": "Pokémon", "desc": "Pokémon management"},
+        "teams": {"icon": "🎯", "title": "Teams", "desc": "Form teams"},
+        "items": {"icon": "🎒", "title": "Items", "desc": "Available objects"},
+        "backpacks": {"icon": "👜", "title": "Backpacks", "desc": "Inventories"},
+    }
+
+    for page_key, page_info in pages.items():
+        is_current = current_page == page_key
+
+        if st.button(
+            f"{page_info['icon']} {page_info['title']}",
+            help=page_info["desc"],
+            key=f"nav_{page_key}",
+            use_container_width=True,
+            type="primary" if is_current else "secondary",
+        ):
+            if not is_current:
+                st.session_state.current_page = page_key
                 st.rerun()
 
-        st.markdown("---")
 
-        st.markdown("### 🧭 Navigation")
+def _show_system_status() -> None:
+    """Show system status in sidebar."""
+    st.markdown("### ℹ️ System Status")
 
-        current_page = st.session_state.get("current_page", "dashboard")
-
-        pages = {
-            "dashboard": {
-                "icon": "🏠",
-                "title": "Dashboard",
-                "desc": "General overview",
-            },
-            "trainers": {"icon": "👥", "title": "Trainers", "desc": "Manage trainers"},
-            "pokemon": {"icon": "⚡", "title": "Pokémon", "desc": "Pokémon management"},
-            "teams": {"icon": "🎯", "title": "Teams", "desc": "Form teams"},
-            "items": {"icon": "🎒", "title": "Items", "desc": "Available objects"},
-            "backpacks": {"icon": "👜", "title": "Backpacks", "desc": "Inventories"},
-        }
-
-        for page_key, page_info in pages.items():
-            is_current = current_page == page_key
-
-            if st.button(
-                f"{page_info['icon']} {page_info['title']}",
-                help=page_info["desc"],
-                key=f"nav_{page_key}",
-                use_container_width=True,
-                type="primary" if is_current else "secondary",
-            ):
-                if not is_current:
-                    st.session_state.current_page = page_key
-                    st.rerun()
-
-        st.markdown("---")
-
-        st.markdown("### ℹ️ System Status")
-
-        api_status = st.session_state.get("api_status", "unknown")
-        if api_status == "connected":
-            st.success("API: Connected")
-        else:
-            st.error("API: Disconnected")
-
-        show_quick_stats()
-
-        st.markdown("---")
-
-        st.markdown("### ⚙️ Actions")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button("🔄", help="Refresh", use_container_width=True):
-                st.cache_data.clear()
-                st.rerun()
-
-        with col2:
-            if st.button("ℹ️", help="About", use_container_width=True):
-                show_about_modal()
-
-        if st.button("🔑 Change Password", use_container_width=True):
-            show_change_password_modal()
+    api_status = st.session_state.get("api_status", "unknown")
+    if api_status == "connected":
+        st.success("API: Connected")
+    else:
+        st.error("API: Disconnected")
 
 
-def show_quick_stats() -> None:
+def _show_sidebar_actions() -> None:
+    """Show action buttons in sidebar."""
+    st.markdown("### ⚙️ Actions")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("🔄", help="Refresh", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+
+    with col2:
+        if st.button("ℹ️", help="About", use_container_width=True):
+            show_about_modal()
+
+    if st.button("🔑 Change Password", use_container_width=True):
+        show_change_password_modal()
+
+
+def _show_quick_stats() -> None:
+    """Show quick statistics in sidebar."""
     try:
 
         @st.cache_data(ttl=300)
@@ -338,6 +355,7 @@ def show_quick_stats() -> None:
 
 
 def show_about_modal() -> None:
+    """Show about system modal."""
     with st.expander("ℹ️ About System", expanded=True):
         st.markdown("""
         ### 🌟 Pokémon Management System
@@ -363,11 +381,11 @@ def show_about_modal() -> None:
         - 🎯 Teams
         - 🎒 Items
         - 👜 Backpacks
-
         """)
 
 
 def show_change_password_modal() -> None:
+    """Show change password modal."""
     with st.expander("🔑 Change Password", expanded=True):
         with st.form("change_password_sidebar"):
             st.markdown("#### Update Password")
@@ -389,32 +407,42 @@ def show_change_password_modal() -> None:
             submitted = st.form_submit_button("🔒 Change Password", type="primary")
 
             if submitted:
-                if not current_password or not new_password:
-                    st.error("Complete all fields")
-                    return
+                _handle_password_change(
+                    current_password, new_password, confirm_password
+                )
 
-                if new_password != confirm_password:
-                    st.error("Passwords don't match")
-                    return
 
-                if len(new_password) < 6:
-                    st.error("New password should have at least 6 characters")
-                    return
+def _handle_password_change(
+    current_password: str, new_password: str, confirm_password: str
+) -> None:
+    """Handle password change logic."""
+    if not current_password or not new_password:
+        st.error("Complete all fields")
+        return
 
-                try:
-                    with st.spinner("Changing password..."):
-                        api_client.change_password(current_password, new_password)
-                    st.success("✅ Password successfully updated")
+    if new_password != confirm_password:
+        st.error("Passwords don't match")
+        return
 
-                except Exception as e:
-                    error_msg = str(e)
-                    if "Current password is incorrect" in error_msg:
-                        st.error("❌ Current password is incorrect")
-                    else:
-                        st.error(f"❌ Error: {error_msg}")
+    if len(new_password) < 6:
+        st.error("New password should have at least 6 characters")
+        return
+
+    try:
+        with st.spinner("Changing password..."):
+            api_client.change_password(current_password, new_password)
+        st.success("✅ Password successfully updated")
+
+    except Exception as e:
+        error_msg = str(e)
+        if "Current password is incorrect" in error_msg:
+            st.error("❌ Current password is incorrect")
+        else:
+            st.error(f"❌ Error: {error_msg}")
 
 
 def show_error_page(error_message: str) -> None:
+    """Show error page with retry options."""
     st.error("🚨 Application Error")
 
     st.markdown(f"""
@@ -442,15 +470,14 @@ def show_error_page(error_message: str) -> None:
 
 
 def show_loading_spinner(message: str = "Loading...") -> Any:
+    """Show loading spinner with custom message."""
     return st.spinner(f"🔄 {message}")
 
 
 def show_success_message(message: str, duration: int = 3) -> None:
+    """Show success message that auto-hides after duration."""
     success_placeholder = st.empty()
     success_placeholder.success(f"✅ {message}")
-
-    import threading
-    import time
 
     def hide_message() -> None:
         time.sleep(duration)
@@ -460,6 +487,7 @@ def show_success_message(message: str, duration: int = 3) -> None:
 
 
 def format_datetime(dt_string: str) -> str:
+    """Format datetime string for display."""
     try:
         dt = datetime.fromisoformat(dt_string.replace("Z", "+00:00"))
         return dt.strftime("%d/%m/%Y %H:%M")
