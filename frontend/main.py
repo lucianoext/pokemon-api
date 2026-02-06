@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from pages.auth import show_auth_page
 from pages.backpacks import show_backpacks_page
+from pages.battles import show_battles_page
 from pages.dashboard import show_dashboard
 from pages.items import show_items_page
 from pages.pokemon import show_pokemon_page
@@ -232,6 +233,8 @@ def show_authenticated_app() -> None:
         show_items_page()
     elif current_page == "backpacks":
         show_backpacks_page()
+    elif current_page == "battles":
+        show_battles_page()
     else:
         show_dashboard()
 
@@ -284,6 +287,7 @@ def _show_navigation_menu() -> None:
         "teams": {"icon": "🎯", "title": "Teams", "desc": "Form teams"},
         "items": {"icon": "🎒", "title": "Items", "desc": "Available objects"},
         "backpacks": {"icon": "👜", "title": "Backpacks", "desc": "Inventories"},
+        "battles": {"icon": "⚔️", "title": "Battles", "desc": "Pokemon battles"},
     }
 
     for page_key, page_info in pages.items():
