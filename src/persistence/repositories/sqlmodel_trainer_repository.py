@@ -1,19 +1,16 @@
-# src/persistence/repositories/sqlmodel_trainer_repository.py
 from typing import Any
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from src.domain.entities.trainer import Gender, Region, Trainer
 from src.domain.repositories.trainer_repository import TrainerRepository
-from src.persistence.database.models import TrainerModel
+from src.persistence.database.models import TeamModel, TrainerModel
 from src.persistence.repositories.base_sqlmodel_repository import BaseSqlModelRepository
 
 
 class SqlModelTrainerRepository(
     BaseSqlModelRepository[Trainer, TrainerModel], TrainerRepository
 ):
-    """SQLModel-based Trainer repository with generics."""
-
     def __init__(self, db: Session):
         super().__init__(
             db=db,
@@ -22,8 +19,30 @@ class SqlModelTrainerRepository(
             model_to_entity_mapper=self._model_to_entity,
         )
 
+    def get_by_id(self, entity_id: int) -> Trainer | None:
+        model = (
+            self.db.query(self.model_class)
+            .options(
+                selectinload(TrainerModel.team_members).joinedload(TeamModel.pokemon)
+            )
+            .filter(self.model_class.id == entity_id)
+            .first()
+        )
+        return self._model_to_entity(model) if model else None
+
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Trainer]:
+        models = (
+            self.db.query(self.model_class)
+            .options(
+                selectinload(TrainerModel.team_members).joinedload(TeamModel.pokemon)
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+        return [self._model_to_entity(model) for model in models]
+
     def _entity_to_model(self, trainer: Trainer) -> TrainerModel:
-        """Convert Trainer entity to SQLModel."""
         return TrainerModel(
             id=trainer.id,
             name=trainer.name,
@@ -32,7 +51,6 @@ class SqlModelTrainerRepository(
         )
 
     def _model_to_entity(self, model: TrainerModel) -> Trainer:
-        """Convert SQLModel to Trainer entity."""
         return Trainer(
             id=model.id,
             name=model.name,
@@ -41,7 +59,6 @@ class SqlModelTrainerRepository(
         )
 
     def _get_enum_value(self, field: Any) -> str | None:
-        """Get string value from enum."""
         if field is None:
             return None
         return field.value if hasattr(field, "value") else str(field)

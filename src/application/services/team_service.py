@@ -1,4 +1,3 @@
-# src/application/services/team_service.py
 from src.application.dtos.team_dto import (
     TeamAddPokemonDTO,
     TeamMemberResponseDTO,
@@ -18,7 +17,7 @@ class TeamService:
         team_repository: TeamRepository,
         trainer_repository: TrainerRepository,
         pokemon_repository: PokemonRepository,
-    ):
+    ) -> None:
         self.team_repository = team_repository
         self.trainer_repository = trainer_repository
         self.pokemon_repository = pokemon_repository

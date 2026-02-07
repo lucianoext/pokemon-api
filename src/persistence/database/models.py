@@ -12,23 +12,32 @@ class TrainerModel(SQLModel, table=True):
     gender: str = Field(max_length=10)
     region: str = Field(max_length=20, index=True)
 
-    team_members: list["TeamModel"] = Relationship(back_populates="trainer")
+    team_members: list["TeamModel"] = Relationship(
+        back_populates="trainer", sa_relationship_kwargs={"lazy": "select"}
+    )
     backpack_items: list["BackpackModel"] = Relationship(back_populates="trainer")
-
     user: Optional["UserModel"] = Relationship(back_populates="trainer")
 
-    # Add these missing battle relationships:
     battles_as_team1: list["BattleModel"] = Relationship(
         back_populates="team1_trainer",
-        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team1_trainer_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[BattleModel.team1_trainer_id]",
+            "lazy": "noload",
+        },
     )
     battles_as_team2: list["BattleModel"] = Relationship(
         back_populates="team2_trainer",
-        sa_relationship_kwargs={"foreign_keys": "[BattleModel.team2_trainer_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[BattleModel.team2_trainer_id]",
+            "lazy": "noload",
+        },
     )
     battles_won: list["BattleModel"] = Relationship(
         back_populates="winner_trainer",
-        sa_relationship_kwargs={"foreign_keys": "[BattleModel.winner_trainer_id]"},
+        sa_relationship_kwargs={
+            "foreign_keys": "[BattleModel.winner_trainer_id]",
+            "lazy": "noload",
+        },
     )
 
 

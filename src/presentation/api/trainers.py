@@ -21,8 +21,18 @@ router = APIRouter(prefix="/trainers", tags=["trainers"])
 
 
 def get_trainer_service(db: Session = Depends(get_database)) -> TrainerService:
+    from src.persistence.repositories.sqlmodel_pokemon_repository import (
+        SqlModelPokemonRepository,
+    )
+    from src.persistence.repositories.sqlmodel_team_repository import (
+        SqlModelTeamRepository,
+    )
+
     trainer_repository = SqlModelTrainerRepository(db)
-    return TrainerService(trainer_repository)
+    team_repository = SqlModelTeamRepository(db)
+    pokemon_repository = SqlModelPokemonRepository(db)
+
+    return TrainerService(trainer_repository, team_repository, pokemon_repository)
 
 
 @router.post("/", response_model=TrainerResponseDTO, status_code=HTTPStatus.CREATED)

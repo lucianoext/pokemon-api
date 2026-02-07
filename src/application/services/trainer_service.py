@@ -1,19 +1,28 @@
-# src/application/services/trainer_service.py
 from src.application.dtos.trainer_dto import (
+    PokemonSummaryDTO,
     TrainerCreateDTO,
     TrainerResponseDTO,
     TrainerUpdateDTO,
 )
 from src.application.services.base_service import BaseService
 from src.domain.entities.trainer import Trainer
+from src.domain.repositories.pokemon_repository import PokemonRepository
+from src.domain.repositories.team_repository import TeamRepository
 from src.domain.repositories.trainer_repository import TrainerRepository
 
 
 class TrainerService(
     BaseService[Trainer, TrainerCreateDTO, TrainerUpdateDTO, TrainerResponseDTO]
 ):
-    def __init__(self, trainer_repository: TrainerRepository):
+    def __init__(
+        self,
+        trainer_repository: TrainerRepository,
+        team_repository: TeamRepository | None = None,
+        pokemon_repository: PokemonRepository | None = None,
+    ):
         super().__init__(trainer_repository)
+        self.team_repository = team_repository
+        self.pokemon_repository = pokemon_repository
 
     def create_trainer(self, trainer_dto: TrainerCreateDTO) -> TrainerResponseDTO:
         return self.create(trainer_dto)
@@ -43,13 +52,30 @@ class TrainerService(
         )
 
     def _transform_to_response_dto(self, trainer: Trainer) -> TrainerResponseDTO:
+        pokemon_team = []
+
+        if self.team_repository and self.pokemon_repository and trainer.id:
+            team_members = self.team_repository.get_team_by_trainer(trainer.id)
+
+            for team_member in team_members:
+                pokemon = self.pokemon_repository.get_by_id(team_member.pokemon_id)
+                if pokemon and pokemon.id is not None:
+                    pokemon_team.append(
+                        PokemonSummaryDTO(
+                            id=pokemon.id,
+                            name=pokemon.name,
+                            type_primary=pokemon.type_primary.value,
+                            level=pokemon.level,
+                        )
+                    )
+
         return TrainerResponseDTO(
             id=trainer.id,
             name=trainer.name,
             gender=trainer.gender.value,
             region=trainer.region.value,
-            team_size=0,
-            pokemon_team=[],
+            team_size=len(pokemon_team),
+            pokemon_team=pokemon_team,
         )
 
     def _apply_update_dto(

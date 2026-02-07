@@ -70,7 +70,30 @@ def show_trainers_list() -> None:
             trainers = [t for t in trainers if t["region"] == region_filter]
 
         if trainers:
-            df = pd.DataFrame(trainers)
+            display_data = []
+            for trainer in trainers:
+                pokemon_names = "No Pokémon"
+                if trainer.get("pokemon_team") and len(trainer["pokemon_team"]) > 0:
+                    names = [pokemon["name"] for pokemon in trainer["pokemon_team"]]
+                    if len(names) <= 3:
+                        pokemon_names = ", ".join(names)
+                    else:
+                        pokemon_names = (
+                            ", ".join(names[:3]) + f" (+{len(names) - 3} more)"
+                        )
+
+                display_data.append(
+                    {
+                        "id": trainer["id"],
+                        "name": trainer["name"],
+                        "gender": trainer["gender"],
+                        "region": trainer["region"],
+                        "team_size": trainer.get("team_size", 0),
+                        "pokemon_display": pokemon_names,
+                    }
+                )
+
+            df = pd.DataFrame(display_data)
 
             st.dataframe(
                 df,
@@ -84,6 +107,11 @@ def show_trainers_list() -> None:
                         "Pokémon in Team",
                         help="Number of Pokémon in the team",
                         format="%d",
+                    ),
+                    "pokemon_display": st.column_config.TextColumn(
+                        "Pokémon Team",
+                        help="Names of Pokémon in the team",
+                        width="large",
                     ),
                 },
                 hide_index=True,
