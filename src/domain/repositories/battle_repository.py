@@ -1,19 +1,13 @@
 from abc import ABC, abstractmethod
 
+from src.domain.repositories.base_repository import BaseRepository
+
 from ..entities.battle import Battle
 
 
-class BattleRepository(ABC):
+class BattleRepository(BaseRepository[Battle], ABC):
     @abstractmethod
     def create_battle(self, battle: Battle) -> Battle:
-        pass
-
-    @abstractmethod
-    def get_by_id(self, battle_id: int) -> Battle | None:
-        pass
-
-    @abstractmethod
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[Battle]:
         pass
 
     @abstractmethod

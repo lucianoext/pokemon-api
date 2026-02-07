@@ -1,3 +1,4 @@
+# src/application/services/auth_service.py
 from datetime import datetime, timedelta
 
 from jose import JWTError, jwt
@@ -106,7 +107,7 @@ class AuthService:
 
         return LoginResponseDTO(user=user_response, tokens=tokens)
 
-    def get_current_user_from_token(self, token: str) -> User | None:  # UP045
+    def get_current_user_from_token(self, token: str) -> User | None:
         try:
             payload = jwt.decode(
                 token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]

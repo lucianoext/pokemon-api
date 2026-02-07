@@ -7,13 +7,13 @@ from sqlmodel import Session
 from src.application.services.auth_service import AuthService
 from src.domain.entities.user import User
 from src.persistence.database import get_database
-from src.persistence.repositories import SqlAlchemyUserRepository
+from src.persistence.repositories import SqlModelUserRepository
 
 security = HTTPBearer()
 
 
 def get_auth_service(db: Session = Depends(get_database)) -> AuthService:
-    user_repository = SqlAlchemyUserRepository(db)
+    user_repository = SqlModelUserRepository(db)
     return AuthService(user_repository)
 
 

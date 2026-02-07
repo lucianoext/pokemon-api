@@ -11,7 +11,7 @@ from src.application.dtos.trainer_dto import (
 from src.application.services.trainer_service import TrainerService
 from src.persistence.database import get_database
 from src.persistence.database.models import UserModel
-from src.persistence.repositories import SqlAlchemyTrainerRepository
+from src.persistence.repositories import SqlModelTrainerRepository
 from src.presentation.dependencies.auth import (
     get_current_active_user,
     get_current_user_optional,
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/trainers", tags=["trainers"])
 
 
 def get_trainer_service(db: Session = Depends(get_database)) -> TrainerService:
-    trainer_repository = SqlAlchemyTrainerRepository(db)
+    trainer_repository = SqlModelTrainerRepository(db)
     return TrainerService(trainer_repository)
 
 

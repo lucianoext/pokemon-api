@@ -1,82 +1,44 @@
+# src/application/services/pokemon_service.py
 from src.application.dtos.pokemon_dto import (
     PokemonCreateDTO,
     PokemonResponseDTO,
     PokemonUpdateDTO,
 )
+from src.application.services.base_service import BaseService
 from src.domain import BusinessRuleException
 from src.domain.entities.pokemon import Pokemon
 from src.domain.repositories.pokemon_repository import PokemonRepository
 
 
-class PokemonService:
+class PokemonService(
+    BaseService[Pokemon, PokemonCreateDTO, PokemonUpdateDTO, PokemonResponseDTO]
+):
     def __init__(self, pokemon_repository: PokemonRepository):
-        self.pokemon_repository = pokemon_repository
+        super().__init__(pokemon_repository)
 
     def create_pokemon(self, dto: PokemonCreateDTO) -> PokemonResponseDTO:
-        self._validate_business_rules_for_creation(dto)
-        pokemon = self._dto_to_entity(dto)
-        created_pokemon = self.pokemon_repository.create(pokemon)
-        return self._transform_to_response_dto(created_pokemon)
+        return self.create(dto)
 
     def get_pokemon(self, pokemon_id: int) -> PokemonResponseDTO | None:
-        pokemon = self.pokemon_repository.get_by_id(pokemon_id)
-        if not pokemon:
-            return None
-        return self._transform_to_response_dto(pokemon)
+        return self.get_by_id(pokemon_id)
 
     def get_all_pokemon(
         self, skip: int = 0, limit: int = 100
     ) -> list[PokemonResponseDTO]:
-        pokemons = self.pokemon_repository.get_all(skip, limit)
-        return [self._transform_to_response_dto(pokemon) for pokemon in pokemons]
+        return self.get_all(skip, limit)
 
     def update_pokemon(
         self, pokemon_id: int, pokemon_dto: PokemonUpdateDTO
     ) -> PokemonResponseDTO | None:
-        existing_pokemon = self.pokemon_repository.get_by_id(pokemon_id)
-        if not existing_pokemon:
-            return None
-
-        updated_pokemon = Pokemon(
-            id=existing_pokemon.id,
-            name=pokemon_dto.name
-            if pokemon_dto.name is not None
-            else existing_pokemon.name,
-            type_primary=pokemon_dto.type_primary
-            if pokemon_dto.type_primary is not None
-            else existing_pokemon.type_primary,
-            type_secondary=pokemon_dto.type_secondary
-            if pokemon_dto.type_secondary is not None
-            else existing_pokemon.type_secondary,
-            attacks=pokemon_dto.attacks
-            if pokemon_dto.attacks is not None
-            else existing_pokemon.attacks,
-            nature=pokemon_dto.nature
-            if pokemon_dto.nature is not None
-            else existing_pokemon.nature,
-            level=pokemon_dto.level
-            if pokemon_dto.level is not None
-            else existing_pokemon.level,
-        )
-
-        self._validate_business_rules_for_update(updated_pokemon)
-
-        saved_pokemon = self.pokemon_repository.update(pokemon_id, updated_pokemon)
-        if saved_pokemon is None:
-            return None
-        return self._transform_to_response_dto(saved_pokemon)
+        return self.update(pokemon_id, pokemon_dto)
 
     def delete_pokemon(self, pokemon_id: int) -> bool:
-        pokemon = self.pokemon_repository.get_by_id(pokemon_id)
-        if not pokemon:
-            return False
-
-        return self.pokemon_repository.delete(pokemon_id)
+        return self.delete(pokemon_id)
 
     def level_up_pokemon(
         self, pokemon_id: int, levels: int = 1
     ) -> PokemonResponseDTO | None:
-        pokemon = self.pokemon_repository.get_by_id(pokemon_id)
+        pokemon = self.repository.get_by_id(pokemon_id)
         if not pokemon:
             return None
 
@@ -84,15 +46,17 @@ class PokemonService:
             raise BusinessRuleException("The level cap is 100")
 
         pokemon.level += levels
-        updated_pokemon = self.pokemon_repository.update(pokemon_id, pokemon)
-        if updated_pokemon is None:
-            return None
-        return self._transform_to_response_dto(updated_pokemon)
+        updated_pokemon = self.repository.update(pokemon_id, pokemon)
+        return (
+            self._transform_to_response_dto(updated_pokemon)
+            if updated_pokemon
+            else None
+        )
 
     def learn_new_attack(
         self, pokemon_id: int, new_attack: str, replace_attack: str | None = None
     ) -> PokemonResponseDTO | None:
-        pokemon = self.pokemon_repository.get_by_id(pokemon_id)
+        pokemon = self.repository.get_by_id(pokemon_id)
         if not pokemon:
             return None
 
@@ -106,8 +70,7 @@ class PokemonService:
         if len(attacks_list) >= 4:
             if not replace_attack:
                 raise BusinessRuleException(
-                    f"'{pokemon.name}' already knows 4 attacks. "
-                    f"You must specify which one to replace."
+                    f"'{pokemon.name}' already knows 4 attacks. You must specify which one to replace."
                 )
 
             if replace_attack not in attacks_list:
@@ -120,10 +83,12 @@ class PokemonService:
         attacks_list.append(new_attack)
         pokemon.attacks = attacks_list
 
-        updated_pokemon = self.pokemon_repository.update(pokemon_id, pokemon)
-        if updated_pokemon is None:
-            return None
-        return self._transform_to_response_dto(updated_pokemon)
+        updated_pokemon = self.repository.update(pokemon_id, pokemon)
+        return (
+            self._transform_to_response_dto(updated_pokemon)
+            if updated_pokemon
+            else None
+        )
 
     def _validate_business_rules_for_creation(self, dto: PokemonCreateDTO) -> None:
         if dto.level < 1 or dto.level > 100:
@@ -151,22 +116,6 @@ class PokemonService:
 
         self._validate_powerful_attacks(pokemon.attacks, pokemon.level)
 
-    def _validate_powerful_attacks(self, attacks_list: list[str], level: int) -> None:
-        powerful_attacks = {
-            "Hyper Beam": 50,
-            "Solar Beam": 40,
-            "Thunder": 25,
-            "Blizzard": 35,
-        }
-
-        for attack in attacks_list:
-            if attack in powerful_attacks:
-                required_level = powerful_attacks[attack]
-                if level < required_level:
-                    raise BusinessRuleException(
-                        f"Attack '{attack}' requires level {required_level}"
-                    )
-
     def _dto_to_entity(self, dto: PokemonCreateDTO) -> Pokemon:
         return Pokemon(
             id=None,
@@ -190,3 +139,38 @@ class PokemonService:
             nature=pokemon.nature.value,
             level=pokemon.level,
         )
+
+    def _apply_update_dto(
+        self, existing_pokemon: Pokemon, dto: PokemonUpdateDTO
+    ) -> Pokemon:
+        non_none_fields = self._get_dto_non_none_fields(dto)
+
+        return Pokemon(
+            id=existing_pokemon.id,
+            name=non_none_fields.get("name", existing_pokemon.name),
+            type_primary=non_none_fields.get(
+                "type_primary", existing_pokemon.type_primary
+            ),
+            type_secondary=non_none_fields.get(
+                "type_secondary", existing_pokemon.type_secondary
+            ),
+            attacks=non_none_fields.get("attacks", existing_pokemon.attacks),
+            nature=non_none_fields.get("nature", existing_pokemon.nature),
+            level=non_none_fields.get("level", existing_pokemon.level),
+        )
+
+    def _validate_powerful_attacks(self, attacks_list: list[str], level: int) -> None:
+        powerful_attacks = {
+            "Hyper Beam": 50,
+            "Solar Beam": 40,
+            "Thunder": 25,
+            "Blizzard": 35,
+        }
+
+        for attack in attacks_list:
+            if attack in powerful_attacks:
+                required_level = powerful_attacks[attack]
+                if level < required_level:
+                    raise BusinessRuleException(
+                        f"Attack '{attack}' requires level {required_level}"
+                    )

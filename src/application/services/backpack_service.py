@@ -1,3 +1,4 @@
+# src/application/services/backpack_service.py
 from src.application.dtos.backpack_dto import (
     BackpackAddItemDTO,
     BackpackItemResponseDTO,
@@ -42,7 +43,6 @@ class BackpackService:
         )
 
         self.backpack_repository.add_item(backpack_entry)
-
         return self.get_trainer_backpack(dto.trainer_id)
 
     def remove_item_from_backpack(
@@ -88,7 +88,6 @@ class BackpackService:
             raise BusinessRuleException("Maximum 999 items of each type allowed")
 
         self.backpack_repository.update_quantity(trainer_id, item_id, dto.new_quantity)
-
         return self.get_trainer_backpack(trainer_id)
 
     def get_trainer_backpack(self, trainer_id: int) -> BackpackResponseDTO:
@@ -127,7 +126,6 @@ class BackpackService:
             raise EntityNotFoundException("Trainer", trainer_id)
 
         self.backpack_repository.clear_backpack(trainer_id)
-
         return self.get_trainer_backpack(trainer_id)
 
     def _validate_add_item_rules(self, dto: BackpackAddItemDTO) -> None:

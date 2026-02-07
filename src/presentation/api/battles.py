@@ -4,6 +4,9 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from persistence.repositories.sqlmodel_battle_repository import (
+    SqlModelBattleRepository,
+)
 from src.application.dtos.battle_dto import (
     BattleCreateDTO,
     BattleResponseDTO,
@@ -13,11 +16,8 @@ from src.application.services.battle_service import BattleService
 from src.domain.exceptions import BusinessRuleException, EntityNotFoundException
 from src.persistence.database import get_database
 from src.persistence.repositories import (
-    SqlAlchemyTeamRepository,
-    SqlAlchemyTrainerRepository,
-)
-from src.persistence.repositories.sqlalchemy_battle_repository import (
-    SqlAlchemyBattleRepository,
+    SqlModelTeamRepository,
+    SqlModelTrainerRepository,
 )
 from src.presentation.dependencies.auth import get_current_user
 
@@ -25,9 +25,9 @@ router = APIRouter(prefix="/battles", tags=["battles"])
 
 
 def get_battle_service(db: Session = Depends(get_database)) -> BattleService:
-    battle_repository = SqlAlchemyBattleRepository(db)
-    trainer_repository = SqlAlchemyTrainerRepository(db)
-    team_repository = SqlAlchemyTeamRepository(db)
+    battle_repository = SqlModelBattleRepository(db)
+    trainer_repository = SqlModelTrainerRepository(db)
+    team_repository = SqlModelTeamRepository(db)
     return BattleService(battle_repository, trainer_repository, team_repository)
 
 

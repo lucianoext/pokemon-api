@@ -10,13 +10,13 @@ from src.application.dtos.pokemon_dto import (
 )
 from src.application.services.pokemon_service import PokemonService
 from src.persistence.database import get_database
-from src.persistence.repositories import SqlAlchemyPokemonRepository
+from src.persistence.repositories import SqlModelPokemonRepository
 
 router = APIRouter(prefix="/pokemon", tags=["pokemon"])
 
 
 def get_pokemon_service(db: Session = Depends(get_database)) -> PokemonService:
-    pokemon_repository = SqlAlchemyPokemonRepository(db)
+    pokemon_repository = SqlModelPokemonRepository(db)
     return PokemonService(pokemon_repository)
 
 

@@ -12,18 +12,18 @@ from src.application.services.team_service import TeamService
 from src.domain.exceptions import BusinessRuleException, EntityNotFoundException
 from src.persistence.database import get_database
 from src.persistence.repositories import (
-    SqlAlchemyPokemonRepository,
-    SqlAlchemyTeamRepository,
-    SqlAlchemyTrainerRepository,
+    SqlModelPokemonRepository,
+    SqlModelTeamRepository,
+    SqlModelTrainerRepository,
 )
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 
 def get_team_service(db: Session = Depends(get_database)) -> TeamService:
-    team_repository = SqlAlchemyTeamRepository(db)
-    trainer_repository = SqlAlchemyTrainerRepository(db)
-    pokemon_repository = SqlAlchemyPokemonRepository(db)
+    team_repository = SqlModelTeamRepository(db)
+    trainer_repository = SqlModelTrainerRepository(db)
+    pokemon_repository = SqlModelPokemonRepository(db)
     return TeamService(team_repository, trainer_repository, pokemon_repository)
 
 

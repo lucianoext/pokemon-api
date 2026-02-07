@@ -1,51 +1,29 @@
 from src.application.dtos.item_dto import ItemCreateDTO, ItemResponseDTO, ItemUpdateDTO
+from src.application.services.base_service import BaseService
 from src.domain.entities.item import Item
 from src.domain.exceptions import BusinessRuleException
 from src.domain.repositories.item_repository import ItemRepository
 
 
-class ItemService:
+class ItemService(BaseService[Item, ItemCreateDTO, ItemUpdateDTO, ItemResponseDTO]):
     def __init__(self, item_repository: ItemRepository):
+        super().__init__(item_repository)
         self.item_repository = item_repository
 
     def create_item(self, dto: ItemCreateDTO) -> ItemResponseDTO:
-        self._validate_business_rules_for_creation(dto)
-        item = self._dto_to_entity(dto)
-        created_item = self.item_repository.create(item)
-        return self._transform_to_response_dto(created_item)
+        return self.create(dto)
 
     def get_item(self, item_id: int) -> ItemResponseDTO | None:
-        item = self.item_repository.get_by_id(item_id)
-        if not item:
-            return None
-        return self._transform_to_response_dto(item)
+        return self.get_by_id(item_id)
 
     def get_all_items(self, skip: int = 0, limit: int = 100) -> list[ItemResponseDTO]:
-        items = self.item_repository.get_all(skip, limit)
-        return [self._transform_to_response_dto(item) for item in items]
+        return self.get_all(skip, limit)
 
     def update_item(self, item_id: int, dto: ItemUpdateDTO) -> ItemResponseDTO | None:
-        existing_item = self.item_repository.get_by_id(item_id)
-        if not existing_item:
-            return None
-
-        updated_item = Item(
-            id=existing_item.id,
-            name=dto.name if dto.name is not None else existing_item.name,
-            type=dto.type if dto.type is not None else existing_item.type,
-            description=dto.description
-            if dto.description is not None
-            else existing_item.description,
-            price=dto.price if dto.price is not None else existing_item.price,
-        )
-
-        self._validate_business_rules_for_update(updated_item)
-
-        saved_item = self.item_repository.update(item_id, updated_item)
-        return self._transform_to_response_dto(saved_item) if saved_item else None
+        return self.update(item_id, dto)
 
     def delete_item(self, item_id: int) -> bool:
-        return self.item_repository.delete(item_id)
+        return self.delete(item_id)
 
     def get_items_by_type(self, item_type: str) -> list[ItemResponseDTO]:
         items = self.item_repository.get_by_type(item_type)
@@ -81,4 +59,15 @@ class ItemService:
             type=item.type.value,
             description=item.description,
             price=item.price,
+        )
+
+    def _apply_update_dto(self, existing_item: Item, dto: ItemUpdateDTO) -> Item:
+        non_none_fields = self._get_dto_non_none_fields(dto)
+
+        return Item(
+            id=existing_item.id,
+            name=non_none_fields.get("name", existing_item.name),
+            type=non_none_fields.get("type", existing_item.type),
+            description=non_none_fields.get("description", existing_item.description),
+            price=non_none_fields.get("price", existing_item.price),
         )

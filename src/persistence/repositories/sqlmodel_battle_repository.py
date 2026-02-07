@@ -1,17 +1,27 @@
+# src/persistence/repositories/sqlmodel_battle_repository.py
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
 from src.domain.entities.battle import Battle
 from src.domain.repositories.battle_repository import BattleRepository
 from src.persistence.database.models import BattleModel, TrainerModel
+from src.persistence.repositories.base_sqlmodel_repository import BaseSqlModelRepository
 
 
-class SqlAlchemyBattleRepository(BattleRepository):
+class SqlModelBattleRepository(
+    BaseSqlModelRepository[Battle, BattleModel], BattleRepository
+):
     def __init__(self, db: Session):
-        self.db = db
+        super().__init__(
+            db=db,
+            model_class=BattleModel,
+            entity_to_model_mapper=self._entity_to_model,
+            model_to_entity_mapper=self._model_to_entity,
+        )
 
-    def create_battle(self, battle: Battle) -> Battle:
-        db_battle = BattleModel(
+    def _entity_to_model(self, battle: Battle) -> BattleModel:
+        return BattleModel(
+            id=battle.id,
             team1_trainer_id=battle.team1_trainer_id,
             team2_trainer_id=battle.team2_trainer_id,
             winner_trainer_id=battle.winner_trainer_id,
@@ -22,27 +32,21 @@ class SqlAlchemyBattleRepository(BattleRepository):
             battle_details=battle.battle_details,
         )
 
-        self.db.add(db_battle)
-        self.db.commit()
-        self.db.refresh(db_battle)
-
-        return self._model_to_entity(db_battle)
-
-    def get_by_id(self, battle_id: int) -> Battle | None:
-        db_battle = (
-            self.db.query(BattleModel).filter(BattleModel.id == battle_id).first()
+    def _model_to_entity(self, model: BattleModel) -> Battle:
+        return Battle(
+            id=model.id,
+            team1_trainer_id=model.team1_trainer_id,
+            team2_trainer_id=model.team2_trainer_id,
+            winner_trainer_id=model.winner_trainer_id,
+            team1_strength=model.team1_strength,
+            team2_strength=model.team2_strength,
+            victory_margin=model.victory_margin,
+            battle_date=model.battle_date,
+            battle_details=model.battle_details,
         )
-        return self._model_to_entity(db_battle) if db_battle else None
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[Battle]:
-        db_battles = (
-            self.db.query(BattleModel)
-            .order_by(BattleModel.__table__.c.battle_date.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
-        return [self._model_to_entity(battle) for battle in db_battles]
+    def create_battle(self, battle: Battle) -> Battle:
+        return self.create(battle)
 
     def get_battles_by_trainer(self, trainer_id: int) -> list[Battle]:
         db_battles = (
@@ -53,7 +57,7 @@ class SqlAlchemyBattleRepository(BattleRepository):
                     BattleModel.team2_trainer_id == trainer_id,
                 )
             )
-            .order_by(BattleModel.__table__.c.battle_date.desc())
+            .order_by(BattleModel.__table__.c.battle_date.desc())  # ← Cambio aquí
             .all()
         )
         return [self._model_to_entity(battle) for battle in db_battles]
@@ -83,11 +87,12 @@ class SqlAlchemyBattleRepository(BattleRepository):
         return int(count)
 
     def get_leaderboard_data(self) -> list[dict]:
-        # Get trainer battle statistics
         subquery_wins = (
             self.db.query(
-                BattleModel.__table__.c.winner_trainer_id.label("trainer_id"),
-                func.count(BattleModel.__table__.c.id).label("wins"),
+                BattleModel.__table__.c.winner_trainer_id.label(
+                    "trainer_id"
+                ),  # ← Cambio aquí
+                func.count(BattleModel.__table__.c.id).label("wins"),  # ← Cambio aquí
             )
             .group_by(BattleModel.__table__.c.winner_trainer_id)
             .subquery()
@@ -103,8 +108,8 @@ class SqlAlchemyBattleRepository(BattleRepository):
             )
             .filter(
                 or_(
-                    BattleModel.__table__.c.team1_trainer_id.isnot(None),
-                    BattleModel.__table__.c.team2_trainer_id.isnot(None),
+                    BattleModel.team1_trainer_id is not None,  # ← Cambio aquí
+                    BattleModel.team2_trainer_id is not None,  # ← Cambio aquí
                 )
             )
             .group_by(
@@ -116,7 +121,6 @@ class SqlAlchemyBattleRepository(BattleRepository):
             .subquery()
         )
 
-        # Join with trainers and calculate statistics
         results = (
             self.db.query(
                 TrainerModel.__table__.c.id,
@@ -158,25 +162,4 @@ class SqlAlchemyBattleRepository(BattleRepository):
         )
 
     def delete_battle(self, battle_id: int) -> bool:
-        db_battle = (
-            self.db.query(BattleModel).filter(BattleModel.id == battle_id).first()
-        )
-        if not db_battle:
-            return False
-
-        self.db.delete(db_battle)
-        self.db.commit()
-        return True
-
-    def _model_to_entity(self, model: BattleModel) -> Battle:
-        return Battle(
-            id=model.id,
-            team1_trainer_id=model.team1_trainer_id,
-            team2_trainer_id=model.team2_trainer_id,
-            winner_trainer_id=model.winner_trainer_id,
-            team1_strength=model.team1_strength,
-            team2_strength=model.team2_strength,
-            victory_margin=model.victory_margin,
-            battle_date=model.battle_date,
-            battle_details=model.battle_details,
-        )
+        return self.delete(battle_id)

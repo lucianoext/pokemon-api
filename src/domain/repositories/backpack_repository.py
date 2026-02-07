@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
+from src.domain.repositories.base_repository import BaseRepository
+
 from ..entities.backpack import Backpack
 
 
-class BackpackRepository(ABC):
+class BackpackRepository(BaseRepository[Backpack], ABC):
     @abstractmethod
     def add_item(self, backpack: Backpack) -> Backpack:
         pass

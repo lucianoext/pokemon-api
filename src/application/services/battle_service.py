@@ -1,3 +1,4 @@
+# src/application/services/battle_service.py
 from datetime import datetime
 
 from src.application.dtos.battle_dto import (
@@ -25,7 +26,6 @@ class BattleService:
         self.team_repository = team_repository
 
     def create_battle(self, dto: BattleCreateDTO) -> BattleResponseDTO:
-        # Validate trainers exist
         team1_trainer = self.trainer_repository.get_by_id(dto.team1_trainer_id)
         if not team1_trainer:
             raise EntityNotFoundException("Trainer", dto.team1_trainer_id)
@@ -38,7 +38,6 @@ class BattleService:
         if not winner_trainer:
             raise EntityNotFoundException("Trainer", dto.winner_trainer_id)
 
-        # Validate both trainers have teams
         team1_size = self.team_repository.get_trainer_team_size(dto.team1_trainer_id)
         team2_size = self.team_repository.get_trainer_team_size(dto.team2_trainer_id)
 
@@ -52,7 +51,6 @@ class BattleService:
                 f"Trainer {team2_trainer.name} has no Pokemon in their team"
             )
 
-        # Create battle entity
         battle = Battle(
             id=None,
             team1_trainer_id=dto.team1_trainer_id,
@@ -65,10 +63,8 @@ class BattleService:
             battle_details=dto.battle_details,
         )
 
-        # Save battle
         created_battle = self.battle_repository.create_battle(battle)
 
-        # Return response DTO with trainer names
         return BattleResponseDTO(
             id=created_battle.id or 0,
             team1_trainer_id=created_battle.team1_trainer_id,
@@ -91,7 +87,6 @@ class BattleService:
 
         battle_dtos = []
         for battle in battles:
-            # Get trainer names
             team1_trainer = self.trainer_repository.get_by_id(battle.team1_trainer_id)
             team2_trainer = self.trainer_repository.get_by_id(battle.team2_trainer_id)
             winner_trainer = self.trainer_repository.get_by_id(battle.winner_trainer_id)
@@ -123,7 +118,6 @@ class BattleService:
 
         battle_dtos = []
         for battle in battles:
-            # Get trainer names
             team1_trainer = self.trainer_repository.get_by_id(battle.team1_trainer_id)
             team2_trainer = self.trainer_repository.get_by_id(battle.team2_trainer_id)
             winner_trainer = self.trainer_repository.get_by_id(battle.winner_trainer_id)
@@ -161,9 +155,7 @@ class BattleService:
             for entry in leaderboard_data
         ]
 
-        total_battles = (
-            sum(entry.total_battles for entry in leaderboard_entries) // 2
-        )  # Divide by 2 since each battle involves 2 trainers
+        total_battles = sum(entry.total_battles for entry in leaderboard_entries) // 2
 
         return LeaderboardResponseDTO(
             leaderboard=leaderboard_entries,
@@ -176,4 +168,4 @@ class BattleService:
         if not battle:
             raise EntityNotFoundException("Battle", battle_id)
 
-        return self.battle_repository.delete_battle(battle_id)
+        return bool(self.battle_repository.delete_battle(battle_id))

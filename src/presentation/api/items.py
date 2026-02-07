@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 from src.application.dtos.item_dto import ItemCreateDTO, ItemResponseDTO, ItemUpdateDTO
 from src.application.services.item_service import ItemService
 from src.persistence.database import get_database
-from src.persistence.repositories import SqlAlchemyItemRepository
+from src.persistence.repositories import SqlModelItemRepository
 
 router = APIRouter(prefix="/items", tags=["items"])
 
 
 def get_item_service(db: Session = Depends(get_database)) -> ItemService:
-    item_repository = SqlAlchemyItemRepository(db)
+    item_repository = SqlModelItemRepository(db)
     return ItemService(item_repository)
 
 

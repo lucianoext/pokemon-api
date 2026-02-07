@@ -1,3 +1,4 @@
+# src/application/services/team_service.py
 from src.application.dtos.team_dto import (
     TeamAddPokemonDTO,
     TeamMemberResponseDTO,
@@ -42,7 +43,6 @@ class TeamService:
         )
 
         self.team_repository.add_pokemon_to_team(team_entry)
-
         return self.get_trainer_team(dto.trainer_id)
 
     def remove_pokemon_from_team(
@@ -55,7 +55,6 @@ class TeamService:
             )
 
         success = self.team_repository.remove_pokemon_from_team(trainer_id, pokemon_id)
-
         if not success:
             raise BusinessRuleException("Failed to remove Pokemon from team")
 
@@ -71,9 +70,7 @@ class TeamService:
             )
 
         self._validate_position_available(trainer_id, dto.new_position, pokemon_id)
-
         self.team_repository.update_position(trainer_id, pokemon_id, dto.new_position)
-
         return self.get_trainer_team(trainer_id)
 
     def get_trainer_team(self, trainer_id: int) -> TeamResponseDTO:
@@ -109,18 +106,14 @@ class TeamService:
     def _validate_add_pokemon_rules(self, dto: TeamAddPokemonDTO) -> None:
         current_size = self.team_repository.get_trainer_team_size(dto.trainer_id)
         if current_size >= 6:
-            raise BusinessRuleException(
-                f"Pokemon {dto.pokemon_id} is already in "
-                f"trainer {dto.trainer_id}'s team"
-            )
+            raise BusinessRuleException("Maximum 6 Pokemon per team")
 
         existing_member = self.team_repository.get_team_member(
             dto.trainer_id, dto.pokemon_id
         )
         if existing_member:
             raise BusinessRuleException(
-                f"Pokemon {dto.pokemon_id} is already in "
-                f"trainer {dto.trainer_id}'s team"
+                f"Pokemon {dto.pokemon_id} is already in trainer {dto.trainer_id}'s team"
             )
 
         self._validate_position_available(dto.trainer_id, dto.position)
@@ -133,6 +126,5 @@ class TeamService:
         for member in team_members:
             if member.position == position and member.pokemon_id != exclude_pokemon_id:
                 raise BusinessRuleException(
-                    f"Position {position} is already occupied "
-                    f"in trainer {trainer_id}'s team"
+                    f"Position {position} is already occupied in trainer {trainer_id}'s team"
                 )

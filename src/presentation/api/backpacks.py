@@ -13,18 +13,18 @@ from src.application.services.backpack_service import BackpackService
 from src.domain.exceptions import BusinessRuleException, EntityNotFoundException
 from src.persistence.database import get_database
 from src.persistence.repositories import (
-    SqlAlchemyBackpackRepository,
-    SqlAlchemyItemRepository,
-    SqlAlchemyTrainerRepository,
+    SqlModelBackpackRepository,
+    SqlModelItemRepository,
+    SqlModelTrainerRepository,
 )
 
 router = APIRouter(prefix="/backpacks", tags=["backpacks"])
 
 
 def get_backpack_service(db: Session = Depends(get_database)) -> BackpackService:
-    backpack_repository = SqlAlchemyBackpackRepository(db)
-    trainer_repository = SqlAlchemyTrainerRepository(db)
-    item_repository = SqlAlchemyItemRepository(db)
+    backpack_repository = SqlModelBackpackRepository(db)
+    trainer_repository = SqlModelTrainerRepository(db)
+    item_repository = SqlModelItemRepository(db)
     return BackpackService(backpack_repository, trainer_repository, item_repository)
 
 

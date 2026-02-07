@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
+from src.domain.repositories.base_repository import BaseRepository
+
 from ..entities.team import Team
 
 
-class TeamRepository(ABC):
+class TeamRepository(BaseRepository[Team], ABC):
     @abstractmethod
     def add_pokemon_to_team(self, team: Team) -> Team:
         pass

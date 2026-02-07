@@ -196,5 +196,8 @@ fail-under = 9.0
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
 
+[tool.bandit]
+output_format = "json"  # Cambiar de txt a json para evitar problemas de encoding
+
 [tool.hatch.build.targets.wheel.sources]
 "src" = ""

@@ -1,61 +1,46 @@
+# src/application/services/trainer_service.py
 from src.application.dtos.trainer_dto import (
     TrainerCreateDTO,
     TrainerResponseDTO,
     TrainerUpdateDTO,
 )
+from src.application.services.base_service import BaseService
 from src.domain.entities.trainer import Trainer
 from src.domain.repositories.trainer_repository import TrainerRepository
 
 
-class TrainerService:
+class TrainerService(
+    BaseService[Trainer, TrainerCreateDTO, TrainerUpdateDTO, TrainerResponseDTO]
+):
     def __init__(self, trainer_repository: TrainerRepository):
-        self.trainer_repository = trainer_repository
+        super().__init__(trainer_repository)
 
     def create_trainer(self, trainer_dto: TrainerCreateDTO) -> TrainerResponseDTO:
-        trainer = Trainer(
-            id=None,
-            name=trainer_dto.name,
-            gender=trainer_dto.gender,
-            region=trainer_dto.region,
-        )
-
-        created_trainer = self.trainer_repository.create(trainer)
-        return self._transform_to_response_dto(created_trainer)
+        return self.create(trainer_dto)
 
     def get_trainer(self, trainer_id: int) -> TrainerResponseDTO | None:
-        trainer = self.trainer_repository.get_by_id(trainer_id)
-        return self._transform_to_response_dto(trainer) if trainer else None
+        return self.get_by_id(trainer_id)
 
     def get_all_trainers(
         self, skip: int = 0, limit: int = 100
     ) -> list[TrainerResponseDTO]:
-        trainers = self.trainer_repository.get_all(skip, limit)
-        return [self._transform_to_response_dto(trainer) for trainer in trainers]
+        return self.get_all(skip, limit)
 
     def update_trainer(
         self, trainer_id: int, trainer_dto: TrainerUpdateDTO
     ) -> TrainerResponseDTO | None:
-        existing_trainer = self.trainer_repository.get_by_id(trainer_id)
-
-        if not existing_trainer:
-            return None
-
-        if trainer_dto.name is not None:
-            existing_trainer.name = trainer_dto.name
-        if trainer_dto.gender is not None:
-            existing_trainer.gender = trainer_dto.gender
-        if trainer_dto.region is not None:
-            existing_trainer.region = trainer_dto.region
-
-        updated_trainer = self.trainer_repository.update(trainer_id, existing_trainer)
-        return (
-            self._transform_to_response_dto(updated_trainer)
-            if updated_trainer
-            else None
-        )
+        return self.update(trainer_id, trainer_dto)
 
     def delete_trainer(self, trainer_id: int) -> bool:
-        return self.trainer_repository.delete(trainer_id)
+        return self.delete(trainer_id)
+
+    def _dto_to_entity(self, dto: TrainerCreateDTO) -> Trainer:
+        return Trainer(
+            id=None,
+            name=dto.name,
+            gender=dto.gender,
+            region=dto.region,
+        )
 
     def _transform_to_response_dto(self, trainer: Trainer) -> TrainerResponseDTO:
         return TrainerResponseDTO(
@@ -65,4 +50,18 @@ class TrainerService:
             region=trainer.region.value,
             team_size=0,
             pokemon_team=[],
+        )
+
+    def _apply_update_dto(
+        self, existing_trainer: Trainer, dto: TrainerUpdateDTO
+    ) -> Trainer:
+        non_none_fields = self._get_dto_non_none_fields(dto)
+
+        return Trainer(
+            id=existing_trainer.id,
+            name=non_none_fields.get("name", existing_trainer.name),
+            gender=non_none_fields.get("gender", existing_trainer.gender),
+            region=non_none_fields.get("region", existing_trainer.region),
+            user_id=existing_trainer.user_id,
+            username=existing_trainer.username,
         )

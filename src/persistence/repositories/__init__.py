@@ -1,17 +1,20 @@
-from .sqlalchemy_backpack_repository import SqlAlchemyBackpackRepository
-from .sqlalchemy_battle_repository import SqlAlchemyBattleRepository
-from .sqlalchemy_item_repository import SqlAlchemyItemRepository
-from .sqlalchemy_pokemon_repository import SqlAlchemyPokemonRepository
-from .sqlalchemy_team_repository import SqlAlchemyTeamRepository
-from .sqlalchemy_trainer_repository import SqlAlchemyTrainerRepository
-from .user_repository import SqlAlchemyUserRepository
+# src/persistence/repositories/__init__.py
+from .base_sqlmodel_repository import BaseSqlModelRepository
+from .sqlmodel_backpack_repository import SqlModelBackpackRepository
+from .sqlmodel_battle_repository import SqlModelBattleRepository
+from .sqlmodel_item_repository import SqlModelItemRepository
+from .sqlmodel_pokemon_repository import SqlModelPokemonRepository
+from .sqlmodel_team_repository import SqlModelTeamRepository
+from .sqlmodel_trainer_repository import SqlModelTrainerRepository
+from .sqlmodel_user_repository import SqlModelUserRepository
 
 __all__ = [
-    "SqlAlchemyTrainerRepository",
-    "SqlAlchemyPokemonRepository",
-    "SqlAlchemyTeamRepository",
-    "SqlAlchemyItemRepository",
-    "SqlAlchemyBackpackRepository",
-    "SqlAlchemyUserRepository",
-    "SqlAlchemyBattleRepository",
+    "BaseSqlModelRepository",
+    "SqlModelBackpackRepository",
+    "SqlModelBattleRepository",
+    "SqlModelItemRepository",
+    "SqlModelPokemonRepository",
+    "SqlModelTeamRepository",
+    "SqlModelTrainerRepository",
+    "SqlModelUserRepository",
 ]
