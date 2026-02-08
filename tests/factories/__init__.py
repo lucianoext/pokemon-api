@@ -25,6 +25,15 @@ from tests.factories.trainer_factories import (
     TrainerUpdateDTOFactory,
 )
 
+from tests.factories.backpack_factories import (
+    BackpackAddItemDTOFactory,
+    BackpackFactory,
+    BackpackItemResponseDTOFactory,
+    BackpackRemoveItemDTOFactory,
+    BackpackResponseDTOFactory,
+    BackpackUpdateQuantityDTOFactory,
+)
+
 __all__ = [
     "PokemonFactory",
     "PokemonCreateDTOFactory",
@@ -44,4 +53,10 @@ __all__ = [
     "TeamUpdatePositionDTOFactory",
     "TeamMemberResponseDTOFactory",
     "TeamResponseDTOFactory",
+    "BackpackFactory",
+    "BackpackAddItemDTOFactory",
+    "BackpackRemoveItemDTOFactory",
+    "BackpackUpdateQuantityDTOFactory",
+    "BackpackItemResponseDTOFactory",
+    "BackpackResponseDTOFactory",
 ]
