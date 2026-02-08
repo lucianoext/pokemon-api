@@ -35,3 +35,7 @@ def mock_user_repository() -> Mock:
 @pytest.fixture
 def mock_backpack_repository() -> Mock:
     return Mock()
+
+@pytest.fixture
+def mock_battle_repository() -> Mock:
+    return Mock()
