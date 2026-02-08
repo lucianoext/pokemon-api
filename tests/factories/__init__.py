@@ -42,6 +42,16 @@ from tests.factories.battle_factories import (
     LeaderboardResponseDTOFactory,
 )
 
+from tests.factories.auth_factories import (
+    ChangePasswordDTOFactory,
+    LoginResponseDTOFactory,
+    TokenResponseDTOFactory,
+    UserFactory,
+    UserLoginDTOFactory,
+    UserRegistrationDTOFactory,
+    UserResponseDTOFactory,
+)
+
 __all__ = [
     "PokemonFactory",
     "PokemonCreateDTOFactory",
@@ -72,4 +82,11 @@ __all__ = [
     "BattleResponseDTOFactory",
     "LeaderboardEntryDTOFactory",
     "LeaderboardResponseDTOFactory",
+    "UserFactory",
+    "UserRegistrationDTOFactory",
+    "UserLoginDTOFactory",
+    "TokenResponseDTOFactory",
+    "UserResponseDTOFactory",
+    "LoginResponseDTOFactory",
+    "ChangePasswordDTOFactory",
 ]
