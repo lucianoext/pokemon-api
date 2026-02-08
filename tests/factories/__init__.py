@@ -10,6 +10,13 @@ from tests.factories.pokemon_factories import (
     PokemonResponseDTOFactory,
     PokemonUpdateDTOFactory,
 )
+from tests.factories.team_factories import (
+    TeamAddPokemonDTOFactory,
+    TeamFactory,
+    TeamMemberResponseDTOFactory,
+    TeamResponseDTOFactory,
+    TeamUpdatePositionDTOFactory,
+)
 from tests.factories.trainer_factories import (
     PokemonSummaryDTOFactory,
     TrainerCreateDTOFactory,
@@ -32,4 +39,9 @@ __all__ = [
     "ItemCreateDTOFactory",
     "ItemUpdateDTOFactory",
     "ItemResponseDTOFactory",
+    "TeamFactory",
+    "TeamAddPokemonDTOFactory",
+    "TeamUpdatePositionDTOFactory",
+    "TeamMemberResponseDTOFactory",
+    "TeamResponseDTOFactory",
 ]
