@@ -306,50 +306,99 @@ You can visualize the main persistence models with the following Mermaid class d
 
 ```mermaid
 classDiagram
-  class TrainerModel {
-    int id
-    string name
-    string gender
-    string region
-  }
+    class TrainerModel {
+        int id
+        string name
+        string gender
+        string region
+    }
 
-  class PokemonModel {
-    int id
-    string name
-    string type_primary
-    string? type_secondary
-    string attacks
-    string nature
-    int level
-  }
+    class PokemonModel {
+        int id
+        string name
+        string type_primary
+        string type_secondary
+        string attacks
+        string nature
+        int level
+    }
 
-  class TeamModel {
-    int id
-    int trainer_id
-    int pokemon_id
-    int position
-    bool is_active
-  }
+    class TeamModel {
+        int id
+        int trainer_id
+        int pokemon_id
+        int position
+        bool is_active
+    }
 
-  class ItemModel {
-    int id
-    string name
-    string type
-    string? description
-    int price
-  }
+    class ItemModel {
+        int id
+        string name
+        string type
+        string description
+        int price
+    }
 
-  class BackpackModel {
-    int id
-    int trainer_id
-    int item_id
-    int quantity
-  }
+    class BackpackModel {
+        int id
+        int trainer_id
+        int item_id
+        int quantity
+    }
 
-  TrainerModel "1" o-- "0..*" TeamModel : team_members
-  PokemonModel "1" o-- "0..*" TeamModel : team_memberships
-  TrainerModel "1" o-- "0..*" BackpackModel : backpack_items
-  ItemModel "1" o-- "0..*" BackpackModel : backpack_entries
+    class UserModel {
+        int id
+        string username
+        string email
+        string hashed_password
+        bool is_active
+        bool is_superuser
+        datetime created_at
+        datetime updated_at
+        int trainer_id
+    }
+
+    class RefreshTokenModel {
+        int id
+        string token
+        int user_id
+        datetime expires_at
+        datetime created_at
+        bool is_revoked
+    }
+
+    class BattleModel {
+        int id
+        int team1_trainer_id
+        int team2_trainer_id
+        int winner_trainer_id
+        float team1_strength
+        float team2_strength
+        float victory_margin
+        datetime battle_date
+        string battle_details
+        datetime created_at
+    }
+
+    %% Core Pokemon relationships
+    TrainerModel "1" ||--o{ "0..*" TeamModel : team_members
+    PokemonModel "1" ||--o{ "0..*" TeamModel : team_memberships
+    TrainerModel "1" ||--o{ "0..*" BackpackModel : backpack_items
+    ItemModel "1" ||--o{ "0..*" BackpackModel : backpack_entries
+
+    %% Authentication relationships
+    UserModel "0..1" ||--o| "0..1" TrainerModel : trainer
+    UserModel "1" ||--o{ "0..*" RefreshTokenModel : refresh_tokens
+
+    %% Battle relationships
+    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_as_team1
+    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_as_team2
+    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_won
+
+    %% Foreign key relationships for battles
+    BattleModel }o--|| TrainerModel : team1_trainer
+    BattleModel }o--|| TrainerModel : team2_trainer
+    BattleModel }o--|| TrainerModel : winner_trainer
 ```
 
 ---
