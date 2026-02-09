@@ -398,6 +398,30 @@ erDiagram
 
 ---
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant PokemonAPI as Pokemon API
+    participant PokeAPI as External PokeAPI
+    participant Database as Local DB
+
+    Note over Client, Database: Obtener Pokemon con Sprite
+
+    Client->>+PokemonAPI: GET /pokemon/{id}
+
+    PokemonAPI->>+Database: SELECT pokemon WHERE id = ?
+    Database-->>-PokemonAPI: Pokemon data (sin sprite)
+
+    PokemonAPI->>+PokeAPI: GET /api/v2/pokemon/{id}
+    PokeAPI-->>-PokemonAPI: Pokemon sprites data
+
+    PokemonAPI->>PokemonAPI: Merge local Pokemon + external sprite
+
+    PokemonAPI-->>-Client: 200 OK - Pokemon with sprite_url
+```
+---
+
+
 
 ## Database Schema
 
