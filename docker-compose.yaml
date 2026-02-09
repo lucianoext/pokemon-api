@@ -35,3 +35,16 @@ services:
     profiles: ["seed"]
     depends_on:
       - pokemon-api
+
+  streamlit:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app:/app/src
+    command: ["python", "-m", "streamlit", "run", "frontend/main.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    depends_on:
+      - pokemon-api
+    profiles: ["dev"]
