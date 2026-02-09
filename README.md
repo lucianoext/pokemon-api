@@ -305,16 +305,16 @@ alembic upgrade head
 You can visualize the main persistence models with the following Mermaid class diagram (supported by many Markdown renderers):
 
 ```mermaid
-classDiagram
-    class TrainerModel {
-        int id
+erDiagram
+    TrainerModel {
+        int id PK
         string name
         string gender
         string region
     }
 
-    class PokemonModel {
-        int id
+    PokemonModel {
+        int id PK
         string name
         string type_primary
         string type_secondary
@@ -323,31 +323,31 @@ classDiagram
         int level
     }
 
-    class TeamModel {
-        int id
-        int trainer_id
-        int pokemon_id
+    TeamModel {
+        int id PK
+        int trainer_id FK
+        int pokemon_id FK
         int position
         bool is_active
     }
 
-    class ItemModel {
-        int id
+    ItemModel {
+        int id PK
         string name
         string type
         string description
         int price
     }
 
-    class BackpackModel {
-        int id
-        int trainer_id
-        int item_id
+    BackpackModel {
+        int id PK
+        int trainer_id FK
+        int item_id FK
         int quantity
     }
 
-    class UserModel {
-        int id
+    UserModel {
+        int id PK
         string username
         string email
         string hashed_password
@@ -355,23 +355,23 @@ classDiagram
         bool is_superuser
         datetime created_at
         datetime updated_at
-        int trainer_id
+        int trainer_id FK
     }
 
-    class RefreshTokenModel {
-        int id
+    RefreshTokenModel {
+        int id PK
         string token
-        int user_id
+        int user_id FK
         datetime expires_at
         datetime created_at
         bool is_revoked
     }
 
-    class BattleModel {
-        int id
-        int team1_trainer_id
-        int team2_trainer_id
-        int winner_trainer_id
+    BattleModel {
+        int id PK
+        int team1_trainer_id FK
+        int team2_trainer_id FK
+        int winner_trainer_id FK
         float team1_strength
         float team2_strength
         float victory_margin
@@ -381,19 +381,19 @@ classDiagram
     }
 
     %% Core Pokemon relationships
-    TrainerModel ||--o{ TeamModel : has
-    PokemonModel ||--o{ TeamModel : appears_in
-    TrainerModel ||--o{ BackpackModel : owns
-    ItemModel ||--o{ BackpackModel : stored_in
+    TrainerModel ||--o{ TeamModel : "has team members"
+    PokemonModel ||--o{ TeamModel : "appears in teams"
+    TrainerModel ||--o{ BackpackModel : "owns items"
+    ItemModel ||--o{ BackpackModel : "stored in backpacks"
 
     %% Authentication relationships
-    UserModel ||--o| TrainerModel : controls
-    UserModel ||--o{ RefreshTokenModel : has_tokens
+    UserModel ||--o| TrainerModel : "controls trainer"
+    UserModel ||--o{ RefreshTokenModel : "has refresh tokens"
 
     %% Battle relationships
-    TrainerModel ||--o{ BattleModel : participates_as_team1
-    TrainerModel ||--o{ BattleModel : participates_as_team2
-    TrainerModel ||--o{ BattleModel : wins
+    TrainerModel ||--o{ BattleModel : "team1_battles"
+    TrainerModel ||--o{ BattleModel : "team2_battles"
+    TrainerModel ||--o{ BattleModel : "won_battles"
 ```
 
 ---
