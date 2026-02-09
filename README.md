@@ -381,24 +381,19 @@ classDiagram
     }
 
     %% Core Pokemon relationships
-    TrainerModel "1" ||--o{ "0..*" TeamModel : team_members
-    PokemonModel "1" ||--o{ "0..*" TeamModel : team_memberships
-    TrainerModel "1" ||--o{ "0..*" BackpackModel : backpack_items
-    ItemModel "1" ||--o{ "0..*" BackpackModel : backpack_entries
+    TrainerModel ||--o{ TeamModel : has
+    PokemonModel ||--o{ TeamModel : appears_in
+    TrainerModel ||--o{ BackpackModel : owns
+    ItemModel ||--o{ BackpackModel : stored_in
 
     %% Authentication relationships
-    UserModel "0..1" ||--o| "0..1" TrainerModel : trainer
-    UserModel "1" ||--o{ "0..*" RefreshTokenModel : refresh_tokens
+    UserModel ||--o| TrainerModel : controls
+    UserModel ||--o{ RefreshTokenModel : has_tokens
 
     %% Battle relationships
-    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_as_team1
-    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_as_team2
-    TrainerModel "1" ||--o{ "0..*" BattleModel : battles_won
-
-    %% Foreign key relationships for battles
-    BattleModel }o--|| TrainerModel : team1_trainer
-    BattleModel }o--|| TrainerModel : team2_trainer
-    BattleModel }o--|| TrainerModel : winner_trainer
+    TrainerModel ||--o{ BattleModel : participates_as_team1
+    TrainerModel ||--o{ BattleModel : participates_as_team2
+    TrainerModel ||--o{ BattleModel : wins
 ```
 
 ---
