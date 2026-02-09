@@ -56,8 +56,6 @@ def show_main_dashboard() -> None:
         trainers = api_client.get_trainers()
 
         pokemon: list[dict[str, Any]] = []
-        items: list[dict[str, Any]] = []
-        teams: list[dict[str, Any]] = []
         backpacks: list[dict[str, Any]] = []
 
         try:
@@ -66,21 +64,11 @@ def show_main_dashboard() -> None:
             print(f"Warning: Could not load pokemon data: {e}")
 
         try:
-            items = api_client.get_items()
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Warning: Could not load items data: {e}")
-
-        try:
-            teams = api_client.get_teams()
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Warning: Could not load teams data: {e}")
-
-        try:
             backpacks = api_client.get_backpacks()
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Warning: Could not load backpacks data: {e}")
 
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             st.metric("Trainers", len(trainers))
@@ -89,72 +77,11 @@ def show_main_dashboard() -> None:
             st.metric("Pokemon", len(pokemon))
 
         with col3:
-            st.metric("Items", len(items))
-
-        with col4:
-            st.metric("Team Entries", len(teams))
-
-        with col5:
             total_backpack_items = sum(bp.get("quantity", 0) for bp in backpacks)
             st.metric("Items in Backpacks", total_backpack_items)
 
-        st.subheader("📈 Quick Stats")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            show_trainers_summary(trainers, teams)
-
-        with col2:
-            show_pokemon_summary(pokemon)
-
     except Exception as e:  # pylint: disable=broad-exception-caught
         st.error(f"Error loading dashboard data: {str(e)}")
-
-
-def show_trainers_summary(
-    trainers: list[dict[str, Any]], teams: list[dict[str, Any]]
-) -> None:
-    """Show summary of trainers."""
-    st.write("**Trainers Summary**")
-
-    if trainers:
-        for trainer in trainers[:5]:
-            team_count = len(
-                [t for t in teams if t.get("trainer_id") == trainer.get("id")]
-            )
-            st.write(
-                f"• {trainer['name']} ({trainer['region']}) - {team_count} Pokemon in team"
-            )
-
-        if len(trainers) > 5:
-            st.write(f"... and {len(trainers) - 5} more trainers")
-    else:
-        st.info("No trainers yet. Create your first trainer!")
-
-
-def show_pokemon_summary(pokemon: list[dict[str, Any]]) -> None:
-    """Show summary of pokemon."""
-    st.write("**Pokemon Summary**")
-
-    if pokemon:
-        type_counts: dict[str, int] = {}
-        for poke in pokemon:
-            poke_type = poke.get("type_primary", "unknown")
-            type_counts[poke_type] = type_counts.get(poke_type, 0) + 1
-
-        sorted_types = sorted(type_counts.items(), key=lambda x: x[1], reverse=True)
-        for poke_type, count in sorted_types[:5]:
-            st.write(f"• {poke_type.title()}: {count} Pokemon")
-
-        levels = [p.get("level", 1) for p in pokemon]
-        if levels:
-            avg_level = sum(levels) / len(levels)
-            max_level = max(levels)
-            st.write(f"• Average Level: {avg_level:.1f}")
-            st.write(f"• Highest Level: {max_level}")
-    else:
-        st.info("No Pokemon yet. Start catching some!")
 
 
 def show_trainers_page() -> None:

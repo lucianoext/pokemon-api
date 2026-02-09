@@ -14,10 +14,13 @@ def show_teams_page() -> None:
 
     st.title("🎯 Teams Management")
 
+    active_tab = st.session_state.get("active_tab", "list")
+
     tab1, tab2, tab3 = st.tabs(["📋 List", "➕ Manage", "🔄 Positions"])
 
     with tab1:
-        show_teams_list()
+        if active_tab != "manage" and active_tab != "positions":
+            show_teams_list()
 
     with tab2:
         show_team_management()
@@ -56,17 +59,20 @@ def _get_teams_filters() -> tuple[str, str]:
 
     with col1:
         search_term = st.text_input(
-            "🔍 Search trainer", placeholder="Search by trainer name..."
+            "🔍 Search trainer",
+            placeholder="Search by trainer name...",
+            key="search_trainer_input",
         )
 
     with col2:
         size_filter = st.selectbox(
             "👥 Filter by team size",
             ["All", "1", "2", "3", "4", "5", "6"],
+            key="team_size_filter",
         )
 
     with col3:
-        if st.button("🔄 Refresh List"):
+        if st.button("🔄 Refresh List", key="btn_refresh_teams_list"):
             st.rerun()
 
     return search_term, size_filter
@@ -161,10 +167,8 @@ def _show_team_roster(members: list[dict[str, Any]]) -> None:
     """Show team roster table."""
     st.write("**Team Roster:**")
 
-    # Sort members by position
     sorted_members = sorted(members, key=lambda x: x.get("position", 1))
 
-    # Create table data
     team_data = []
     for member in sorted_members:
         team_data.append(
@@ -208,6 +212,7 @@ def _show_team_actions(team: dict[str, Any], members: list[dict[str, Any]]) -> N
         ):
             st.session_state["selected_trainer_for_management"] = trainer_id
             st.session_state["selected_trainer_name"] = trainer_name
+            st.session_state["active_tab"] = "manage"
             st.rerun()
 
         if st.button(
@@ -217,9 +222,9 @@ def _show_team_actions(team: dict[str, Any], members: list[dict[str, Any]]) -> N
         ):
             st.session_state["selected_trainer_for_positions"] = trainer_id
             st.session_state["selected_trainer_name"] = trainer_name
+            st.session_state["active_tab"] = "positions"
             st.rerun()
 
-    # Team strength indicator
     total_levels = sum(member.get("pokemon_level", 1) for member in members)
     st.metric("Team Strength", total_levels)
 
@@ -252,9 +257,10 @@ def _show_selected_trainer_management(trainer_id: int, trainer_name: str) -> Non
     """Show management for selected trainer."""
     st.info(f"Managing team for: **{trainer_name}**")
 
-    if st.button("🔙 Back to Trainer Selection"):
+    if st.button("🔙 Back to Trainer Selection", key="btn_back_to_mgmt_select"):
         st.session_state.pop("selected_trainer_for_management", None)
         st.session_state.pop("selected_trainer_name", None)
+        st.session_state.pop("active_tab", None)
         st.rerun()
 
     show_trainer_team_management(trainer_id)
@@ -266,9 +272,12 @@ def _show_trainer_selection_for_management(trainers: list[dict[str, Any]]) -> No
         "Select trainer to manage:",
         options=trainers,
         format_func=lambda x: f"{x['name']} (ID: {x['id']}) - {x['region']}",
+        key="management_trainer_select",
     )
 
-    if trainer and st.button("Manage This Trainer's Team", type="primary"):
+    if trainer and st.button(
+        "Manage This Trainer's Team", type="primary", key="btn_manage_team_select"
+    ):
         st.session_state["selected_trainer_for_management"] = trainer["id"]
         st.session_state["selected_trainer_name"] = trainer["name"]
         st.rerun()
@@ -324,12 +333,14 @@ def _show_add_pokemon_form(
             "Select Pokémon:",
             options=available_pokemon,
             format_func=lambda x: f"{x['name']} (Level {x.get('level', 1)}) - {x.get('type_primary', 'unknown')}",
+            key=f"pokemon_select_{trainer_id}",
         )
 
-        # Get available positions
         occupied_positions = [m.get("position") for m in current_members]
         available_positions = [i for i in range(1, 7) if i not in occupied_positions]
-        position = st.selectbox("Position:", available_positions)
+        position = st.selectbox(
+            "Position:", available_positions, key=f"position_select_{trainer_id}"
+        )
 
         if st.form_submit_button("Add to Team", type="primary"):
             _handle_add_pokemon_to_team(trainer_id, selected_pokemon, position)
@@ -432,9 +443,10 @@ def _show_selected_trainer_positions(trainer_id: int, trainer_name: str) -> None
     """Show position management for selected trainer."""
     st.info(f"Managing positions for: **{trainer_name}**")
 
-    if st.button("🔙 Back to Trainer Selection"):
+    if st.button("🔙 Back to Trainer Selection", key="btn_back_to_pos_select"):
         st.session_state.pop("selected_trainer_for_positions", None)
         st.session_state.pop("selected_trainer_name", None)
+        st.session_state.pop("active_tab", None)
         st.rerun()
 
     show_trainer_position_management(trainer_id)
@@ -449,7 +461,9 @@ def _show_trainer_selection_for_positions(trainers: list[dict[str, Any]]) -> Non
         key="position_trainer_select",
     )
 
-    if trainer and st.button("Manage Positions", type="primary"):
+    if trainer and st.button(
+        "Manage Positions", type="primary", key="btn_manage_positions_select"
+    ):
         st.session_state["selected_trainer_for_positions"] = trainer["id"]
         st.session_state["selected_trainer_name"] = trainer["name"]
         st.rerun()
@@ -590,7 +604,6 @@ def _show_team_metrics(team: dict[str, Any], members: list[dict[str, Any]]) -> N
         st.metric("Average Level", f"{avg_level:.1f}")
 
     with col3:
-        # Type distribution
         types = [member.get("pokemon_type", "unknown") for member in members]
         unique_types = len(set(types))
         st.metric("Unique Types", unique_types)

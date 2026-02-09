@@ -20,6 +20,7 @@ def show_auth_page() -> None:
     - 🎯 **Teams** - Form battle teams
     - 🎒 **Items** - Manage objects and tools
     - 👜 **Backpacks** - Manage inventories
+    - ⚔️ **Battles** - Simulate pokémon battles
     """)
 
     st.divider()
@@ -37,24 +38,12 @@ def show_login_form() -> None:
     """Show login form."""
     st.subheader("🔑 Sign In")
 
-    _show_demo_accounts()
-
     with st.form("login_form"):
         username, password = _get_login_inputs()
         submitted = _get_login_submit_section()
 
         if submitted:
             _handle_login_submission(username, password)
-
-
-def _show_demo_accounts() -> None:
-    """Show demo accounts information."""
-    with st.expander("ℹ️ Test Accounts"):
-        st.write("""
-        **Demo accounts:**
-        - User: `demo_user` / Password: `demo123`
-        - Admin: `admin` / Password: `admin123`
-        """)
 
 
 def _get_login_inputs() -> tuple[str, str]:

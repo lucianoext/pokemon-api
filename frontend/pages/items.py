@@ -8,7 +8,6 @@ from utils.validators import FormValidators
 
 
 def show_items_page() -> None:
-    """Show items management page."""
     st.subheader("🎒 Items Management")
 
     tab1, tab2 = st.tabs(["View Items", "Create Item"])
@@ -21,39 +20,40 @@ def show_items_page() -> None:
 
 
 def show_items_list() -> None:
-    """Show list of items with management options."""
     try:
         items_list = api_client.get_items()
 
         if items_list:
-            # Search and filter options
             col1, col2, col3 = st.columns([2, 1, 1])
 
             with col1:
                 search_term = st.text_input(
-                    "🔍 Search Items", placeholder="Enter item name..."
+                    "🔍 Search Items",
+                    placeholder="Enter item name...",
+                    key="search_items_input",
                 )
 
             with col2:
                 type_filter = st.selectbox(
-                    "Filter by Type", ["All"] + FormValidators.get_item_types()
+                    "Filter by Type",
+                    ["All"] + FormValidators.get_item_types(),
+                    key="items_type_filter",
                 )
 
             with col3:
                 sort_option = st.selectbox(
-                    "Sort by", ["Name", "Price (Low-High)", "Price (High-Low)", "Type"]
+                    "Sort by",
+                    ["Name", "Price (Low-High)", "Price (High-Low)", "Type"],
+                    key="items_sort_option",
                 )
 
-            # Filter and sort items
             filtered_items = filter_and_sort_items(
                 items_list, search_term, type_filter, sort_option
             )
 
             if filtered_items:
-                # Display statistics
                 show_items_statistics(filtered_items)
 
-                # Display items
                 for item in filtered_items:
                     show_item_card(item)
             else:
@@ -61,7 +61,7 @@ def show_items_list() -> None:
         else:
             st.info("No items registered yet.")
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:
         st.error(f"Error loading items: {str(e)}")
 
 
@@ -71,20 +71,16 @@ def filter_and_sort_items(
     type_filter: str,
     sort_option: str,
 ) -> list[dict[str, Any]]:
-    """Filter and sort items list based on criteria."""
     filtered = items_list
 
-    # Apply search filter
     if search_term:
         filtered = [
             item for item in filtered if search_term.lower() in item["name"].lower()
         ]
 
-    # Apply type filter
     if type_filter != "All":
         filtered = [item for item in filtered if item["type"] == type_filter]
 
-    # Apply sorting
     if sort_option == "Name":
         filtered.sort(key=lambda x: x["name"].lower())
     elif sort_option == "Price (Low-High)":
@@ -98,7 +94,6 @@ def filter_and_sort_items(
 
 
 def show_items_statistics(items_list: list[dict[str, Any]]) -> None:
-    """Show statistics about the items."""
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -122,7 +117,6 @@ def show_items_statistics(items_list: list[dict[str, Any]]) -> None:
 
 
 def show_item_card(item: dict[str, Any]) -> None:
-    """Show individual item card with management options."""
     with st.expander(f"🎒 {item['name']} - ₽{item['price']}"):
         col1, col2, col3 = st.columns([2, 1, 1])
 
@@ -140,32 +134,64 @@ def show_item_card(item: dict[str, Any]) -> None:
 
         with col3:
             if st.button("🗑️ Delete", key=f"delete_item_{item['id']}", type="secondary"):
-                handle_item_deletion(item["id"])
+                st.session_state[f"deleting_item_{item['id']}"] = True
+                st.rerun()
 
-        # Show edit form if editing
+        if st.session_state.get(f"deleting_item_{item['id']}", False):
+            show_delete_confirmation(item)
+
         if st.session_state.get(f"editing_item_{item['id']}", False):
             show_edit_item_form(item)
 
 
-def handle_item_deletion(item_id: int) -> None:
-    """Handle item deletion with confirmation."""
-    confirm_key = f"confirm_delete_item_{item_id}"
+def show_delete_confirmation(item: dict[str, Any]) -> None:
+    st.markdown("---")
 
-    if st.session_state.get(confirm_key, False):
-        try:
+    with st.container():
+        st.error("⚠️ **Confirm Deletion**")
+
+        col_info, col_actions = st.columns([2, 1])
+
+        with col_info:
+            st.write(f"Are you sure you want to delete **{item['name']}**?")
+            st.write("This action cannot be undone.")
+            st.write(f"• **Type:** {item['type']}")
+            st.write(f"• **Price:** ₽{item['price']}")
+
+        with col_actions:
+            if st.button(
+                "✅ Yes, Delete",
+                key=f"confirm_delete_{item['id']}",
+                type="secondary",
+                use_container_width=True,
+            ):
+                handle_item_deletion_confirmed(item["id"])
+
+            if st.button(
+                "❌ Cancel", key=f"cancel_delete_{item['id']}", use_container_width=True
+            ):
+                st.session_state[f"deleting_item_{item['id']}"] = False
+                st.rerun()
+
+
+def handle_item_deletion_confirmed(item_id: int) -> None:
+    try:
+        with st.spinner("Deleting item..."):
             api_client.delete_item(item_id)
-            st.success("Item deleted successfully!")
-            st.session_state[confirm_key] = False
-            st.rerun()
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            st.error(f"Error deleting item: {str(e)}")
-    else:
-        st.session_state[confirm_key] = True
-        st.warning("Click delete again to confirm")
+
+        st.success("Item deleted successfully!")
+
+        st.session_state.pop(f"deleting_item_{item_id}", None)
+        st.session_state.pop(f"editing_item_{item_id}", None)
+
+        st.rerun()
+
+    except Exception as e:
+        st.error(f"Error deleting item: {str(e)}")
+        st.session_state.pop(f"deleting_item_{item_id}", None)
 
 
 def show_create_item_form() -> None:
-    """Show form to create new item."""
     with st.form("create_item_form"):
         st.subheader("Create New Item")
 
@@ -195,8 +221,6 @@ def show_create_item_form() -> None:
 def handle_create_item_submission(
     name: str, item_type: str, price: int, description: str
 ) -> None:
-    """Handle item creation form submission."""
-    # Validate inputs
     name_valid, name_error = FormValidators.validate_item_name(name)
     price_valid, price_error = FormValidators.validate_price(price)
 
@@ -221,25 +245,33 @@ def handle_create_item_submission(
         st.success(f"Item '{name}' created successfully!")
         st.json(response)
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
+    except Exception as e:
         st.error(f"Error creating item: {str(e)}")
 
 
 def show_edit_item_form(item: dict[str, Any]) -> None:
-    """Show form to edit existing item."""
     form_key = f"edit_item_form_{item['id']}"
 
+    st.markdown("---")
+
     with st.form(form_key):
-        st.subheader(f"Edit {item['name']}")
+        st.subheader(f"✏️ Edit {item['name']}")
 
         col1, col2 = st.columns(2)
 
         with col1:
             name = st.text_input("Item Name*", value=item["name"])
+
+            available_types = FormValidators.get_item_types()
+            try:
+                current_index = available_types.index(item["type"])
+            except ValueError:
+                current_index = 0
+
             item_type = st.selectbox(
                 "Type*",
-                FormValidators.get_item_types(),
-                index=FormValidators.get_item_types().index(item["type"]),
+                available_types,
+                index=current_index,
             )
 
         with col2:
@@ -251,7 +283,6 @@ def show_edit_item_form(item: dict[str, Any]) -> None:
             "Description", value=item.get("description", "") or ""
         )
 
-        # Buttons
         col1, col2 = st.columns(2)
 
         with col1:
@@ -271,8 +302,6 @@ def show_edit_item_form(item: dict[str, Any]) -> None:
 def handle_edit_item_submission(
     item_id: int, name: str, item_type: str, price: int, description: str
 ) -> None:
-    """Handle item edit form submission."""
-    # Validate inputs
     name_valid, name_error = FormValidators.validate_item_name(name)
     price_valid, price_error = FormValidators.validate_price(price)
 
