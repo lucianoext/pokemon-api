@@ -1,4 +1,3 @@
-# src/persistence/repositories/sqlmodel_battle_repository.py
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 

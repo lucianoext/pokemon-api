@@ -1,4 +1,3 @@
-# src/application/services/pokemon_service.py
 from src.application.dtos.pokemon_dto import (
     PokemonCreateDTO,
     PokemonResponseDTO,

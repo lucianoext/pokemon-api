@@ -1,4 +1,3 @@
-# src/persistence/repositories/sqlmodel_pokemon_repository.py
 import json
 from typing import Any
 

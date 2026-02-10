@@ -1,4 +1,3 @@
-# src/persistence/repositories/base_sqlmodel_repository.py
 from collections.abc import Callable
 from typing import TypeVar
 

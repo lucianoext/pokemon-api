@@ -1,4 +1,3 @@
-# src/application/services/base_service.py
 from typing import TypeVar
 
 from pydantic import BaseModel

@@ -1,4 +1,3 @@
-# src/application/services/battle_service.py
 from datetime import datetime
 
 from src.application.dtos.battle_dto import (

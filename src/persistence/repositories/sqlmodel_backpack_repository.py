@@ -1,4 +1,3 @@
-# src/persistence/repositories/sqlmodel_backpack_repository.py
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 

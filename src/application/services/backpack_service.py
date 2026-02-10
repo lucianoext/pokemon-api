@@ -1,4 +1,3 @@
-# src/application/services/backpack_service.py
 from src.application.dtos.backpack_dto import (
     BackpackAddItemDTO,
     BackpackItemResponseDTO,

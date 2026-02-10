@@ -1,4 +1,3 @@
-# src/persistence/repositories/__init__.py
 from .base_sqlmodel_repository import BaseSqlModelRepository
 from .sqlmodel_backpack_repository import SqlModelBackpackRepository
 from .sqlmodel_battle_repository import SqlModelBattleRepository

@@ -1,4 +1,3 @@
-# src/persistence/repositories/sqlmodel_item_repository.py
 from typing import Any
 
 from sqlalchemy.orm import Session
